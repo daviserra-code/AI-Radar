@@ -1,31 +1,63 @@
 {% extends "base.html" %}
+
+{% block title %}Nuovo Segnale // Admin{% endblock %}
+
 {% block content %}
-<h1>Nuovo articolo</h1>
-<form method="post" class="admin-form">
-  <label>Titolo
-    <input type="text" name="title" required />
-  </label>
 
-  <label>Riassunto
-    <textarea name="summary" rows="3"></textarea>
-  </label>
+<div class="container">
+    
+    <div style="margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between;">
+        <h1 style="color: white;">> INJECT_NEW_SIGNAL</h1>
+        <span class="mono-font" style="color: var(--text-muted); font-size: 0.8rem;">ADMIN_ACCESS_GRANTED</span>
+    </div>
 
-  <label>Categoria
-    <input type="text" name="category_name" value="Generale" />
-  </label>
+    <div class="form-container">
+        <form method="post" action="/admin/new">
+            
+            <div class="form-group">
+                <label for="title">Titolo Segnale</label>
+                <input type="text" id="title" name="title" placeholder="Es: Llama-3 Benchmarks on RTX 4090..." required autocomplete="off">
+            </div>
 
-  <label>URL fonte
-    <input type="url" name="source_url" />
-  </label>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="category">Categoria</label>
+                    <select id="category" name="category">
+                        <option value="General">Generale</option>
+                        <option value="Hardware">Hardware Lab</option>
+                        <option value="LLM">Local LLMs</option>
+                        <option value="Frameworks">Frameworks</option>
+                        <option value="Market">Market Analysis</option>
+                    </select>
+                </div>
 
-  <label>Contenuto
-    <textarea name="content" rows="12" required></textarea>
-  </label>
+                <div class="form-group">
+                    <label for="source_url">URL Fonte (Opzionale)</label>
+                    <input type="url" id="source_url" name="source_url" placeholder="https://...">
+                </div>
+            </div>
 
-  <label>Commento editoriale (facoltativo)
-    <textarea name="editor_comment" rows="4"></textarea>
-  </label>
+            <div class="form-group">
+                <label for="summary">Briefing / Riassunto</label>
+                <textarea id="summary" name="summary" rows="3" placeholder="Sintesi per la card in homepage..."></textarea>
+            </div>
 
-  <button type="submit">Pubblica</button>
-</form>
+            <div class="form-group">
+                <label for="content">Contenuto Markdown</label>
+                <textarea id="content" name="content" class="code-editor" placeholder="# Inizia a scrivere qui... Usa Markdown."></textarea>
+            </div>
+
+            <div class="form-group" style="border-top: 1px dashed #333; padding-top: 1rem;">
+                <label for="editorial_comment" style="color: var(--neon-purple);">// Commento Editoriale (Davide)</label>
+                <textarea id="editorial_comment" name="editorial_comment" rows="2" placeholder="La tua opinione personale..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                PUBBLICA SEGNALE_
+            </button>
+
+        </form>
+    </div>
+</div>
+
 {% endblock %}

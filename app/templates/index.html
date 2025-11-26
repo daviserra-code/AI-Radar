@@ -2,74 +2,63 @@
 {% block content %}
 
 <section class="hero">
-  <div class="hero-text">
-    <h1 class="hero-title">AI Observatory per LLM <span>on-prem</span> &amp; stack locali</h1>
-    <p class="hero-subtitle">
-      Feed automatici, analisi generate dall’AI e commenti editoriali su modelli, framework
-      e hardware per tenersi aggiornati senza annegare nell’hype.
-    </p>
-    <div class="hero-actions">
-      <div class="hero-pill">⚙️ Focus: local inference, MLOps casalingo, AI boxes &amp; mini-PC</div>
-      <div class="hero-secondary">🛰️ Modalità “Ask Observatory” in arrivo per Q&amp;A sul tuo archivio.</div>
-    </div>
-  </div>
-  <div class="hero-side">
-    <div class="hero-panel">
-      <div class="hero-panel-label">Oggi nel radar</div>
-      <ul class="hero-list">
-        <li>• Release LLM &amp; modelli open source</li>
-        <li>• Aggiornamenti LangChain / Transformers / ChromaDB</li>
-        <li>• MiniPC &amp; AI boxes per inference locale</li>
-        <li>• Insight editoriali in stile tech-ironico</li>
-      </ul>
-    </div>
+  <div class="hero-kicker">AI / LLM ON-PREM &bull; STACK LOCALE</div>
+  <h1 class="hero-title">
+    Radar tecnico su LLM <span>locali</span>, framework e hardware da laboratorio casalingo.
+  </h1>
+  <p class="hero-subtitle">
+    Notizie generate dall’AI, filtrate su ciò che interessa davvero a chi costruisce e fa girare
+    modelli in casa: miniPC, GPU, framework, orchestrazione e un pizzico di ironia editoriale.
+  </p>
+  <div class="hero-meta-row">
+    <div class="hero-chip">⚙️ Focus: LLM on-prem, inference locale, toolchain dev</div>
+    <div class="hero-chip">📡 Ask Observatory &amp; RAG integration in arrivo</div>
   </div>
 </section>
 
 <section class="section-header">
-  <h2>Ultime dal mondo LLM &amp; AI Stack</h2>
-  <p>News generate dall’AI, con possibilità di layer editoriale sopra i contenuti grezzi.</p>
+  <h2>Ultime dal radar</h2>
+  <p>Feed automatici + layer di riscrittura LLM, pronti per i tuoi commenti editoriali.</p>
 </section>
 
-<div class="article-grid">
+<section class="news-grid">
   {% for article in articles %}
   <article class="card">
-    <div class="card-header">
-      <div class="badge-row">
-        <span class="pill pill-category">
-          {% if article.category %}
-            {{ article.category.name }}
-          {% else %}
-            Generale
-          {% endif %}
-        </span>
-        {% if article.ai_generated %}
-          <span class="pill pill-ai">AI generated</span>
+    <div class="card-top-row">
+      <div>
+        {% if article.category %}
+          <span class="card-tag">{{ article.category.name }}</span>
         {% else %}
-          <span class="pill pill-editorial">Editoriale</span>
+          <span class="card-tag">Generale</span>
         {% endif %}
       </div>
-      <h2 class="card-title">
-        <a href="/article/{{ article.slug }}">{{ article.title }}</a>
-      </h2>
+      <div class="card-badge-secondary">
+        {% if article.ai_generated %}
+          <span class="card-tag card-tag-ai">AI generated</span>
+        {% else %}
+          <span class="card-tag card-tag-editorial">Editoriale</span>
+        {% endif %}
+      </div>
     </div>
 
+    <h3>
+      <a href="/article/{{ article.slug }}">{{ article.title }}</a>
+    </h3>
+
     {% if article.summary %}
-      <p class="summary">{{ article.summary }}</p>
+      <p>{{ article.summary }}</p>
     {% else %}
-      <p class="summary">{{ article.content[:240] }}...</p>
+      <p>{{ article.content[:260] }}...</p>
     {% endif %}
 
-    <div class="meta meta-bottom">
-      <span class="date">{{ article.created_at.strftime("%Y-%m-%d") }}</span>
+    <div class="card-meta">
+      <span>{{ article.created_at.strftime("%Y-%m-%d") }}</span>
       {% if article.source_url %}
-      <span class="source-link">
-        <a href="{{ article.source_url }}" target="_blank">Fonte</a>
-      </span>
+      <span><a href="{{ article.source_url }}" target="_blank">Fonte</a></span>
       {% endif %}
     </div>
   </article>
   {% endfor %}
-</div>
+</section>
 
 {% endblock %}

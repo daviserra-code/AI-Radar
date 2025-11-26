@@ -5,30 +5,38 @@
   <title>{{ page_title or "AI Observatory" }}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="/static/styles.css" />
+  <!-- Facoltativo: se vuoi davvero Inter / JetBrains da webfonts
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  -->
 </head>
 <body>
-  <header class="site-header">
-    <div class="brand-block">
-      <div class="logo">AI<span>OBS</span></div>
-      <div class="logo-caption">Local &amp; On-Prem LLM Radar</div>
+  <header>
+    <div class="container nav-flex">
+      <div class="logo-container">
+        <div class="logo-title">AI<span> Observatory</span></div>
+        <div class="logo-subtitle">Local &amp; On-Prem LLM Radar</div>
+      </div>
+      <nav class="nav-links">
+        <a href="/">Home</a>
+        <a href="/category/llm">LLM</a>
+        <a href="/category/frameworks">Frameworks</a>
+        <a href="/category/hardware">Hardware</a>
+        <a href="#" class="nav-disabled">Ask Observatory (soon)</a>
+        <a href="/admin/new" class="nav-cta">+ Editorial / Post</a>
+      </nav>
     </div>
-    <nav class="main-nav">
-      <a href="/">Home</a>
-      <a href="/category/llm">LLM</a>
-      <a href="/category/frameworks">Frameworks</a>
-      <a href="/category/hardware">Hardware</a>
-      <!-- /ask arriverà dopo, per ora lo teniamo come anchor neutra -->
-      <a href="#" class="nav-pill disabled">Ask Observatory (soon)</a>
-      <a href="/admin/new" class="nav-cta">+ Editorial / Post</a>
-    </nav>
   </header>
 
-  <main class="content">
+  <main class="container">
     {% block content %}{% endblock %}
   </main>
 
   <footer class="site-footer">
-    <span>AI Observatory (code name) • Powered by local LLMs &amp; Davide</span>
+    <div class="container">
+      AI Observatory (code name) • Local / On-Prem AI stack, LLMs &amp; editorial takes by Davide
+    </div>
   </footer>
 </body>
 </html>
