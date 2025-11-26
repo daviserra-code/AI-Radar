@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="hero">
+  <div class="hero-text">
+    <h1 class="hero-title">AI Observatory per LLM <span>on-prem</span> &amp; stack locali</h1>
+    <p class="hero-subtitle">
+      Feed automatici, analisi generate dall’AI e commenti editoriali su modelli, framework
+      e hardware per tenersi aggiornati senza annegare nell’hype.
+    </p>
+    <div class="hero-actions">
+      <div class="hero-pill">⚙️ Focus: local inference, MLOps casalingo, AI boxes &amp; mini-PC</div>
+      <div class="hero-secondary">🛰️ Modalità “Ask Observatory” in arrivo per Q&amp;A sul tuo archivio.</div>
+    </div>
+  </div>
+  <div class="hero-side">
+    <div class="hero-panel">
+      <div class="hero-panel-label">Oggi nel radar</div>
+      <ul class="hero-list">
+        <li>• Release LLM &amp; modelli open source</li>
+        <li>• Aggiornamenti LangChain / Transformers / ChromaDB</li>
+        <li>• MiniPC &amp; AI boxes per inference locale</li>
+        <li>• Insight editoriali in stile tech-ironico</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="section-header">
+  <h2>Ultime dal mondo LLM &amp; AI Stack</h2>
+  <p>News generate dall’AI, con possibilità di layer editoriale sopra i contenuti grezzi.</p>
+</section>
+
+<div class="article-grid">
+  {% for article in articles %}
+  <article class="card">
+    <div class="card-header">
+      <div class="badge-row">
+        <span class="pill pill-category">
+          {% if article.category %}
+            {{ article.category.name }}
+          {% else %}
+            Generale
+          {% endif %}
+        </span>
+        {% if article.ai_generated %}
+          <span class="pill pill-ai">AI generated</span>
+        {% else %}
+          <span class="pill pill-editorial">Editoriale</span>
+        {% endif %}
+      </div>
+      <h2 class="card-title">
+        <a href="/article/{{ article.slug }}">{{ article.title }}</a>
+      </h2>
+    </div>
+
+    {% if article.summary %}
+      <p class="summary">{{ article.summary }}</p>
+    {% else %}
+      <p class="summary">{{ article.content[:240] }}...</p>
+    {% endif %}
+
+    <div class="meta meta-bottom">
+      <span class="date">{{ article.created_at.strftime("%Y-%m-%d") }}</span>
+      {% if article.source_url %}
+      <span class="source-link">
+        <a href="{{ article.source_url }}" target="_blank">Fonte</a>
+      </span>
+      {% endif %}
+    </div>
+  </article>
+  {% endfor %}
+</div>
+
+{% endblock %}

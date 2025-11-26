@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Nuovo articolo</h1>
+<form method="post" class="admin-form">
+  <label>Titolo
+    <input type="text" name="title" required />
+  </label>
+
+  <label>Riassunto
+    <textarea name="summary" rows="3"></textarea>
+  </label>
+
+  <label>Categoria
+    <input type="text" name="category_name" value="Generale" />
+  </label>
+
+  <label>URL fonte
+    <input type="url" name="source_url" />
+  </label>
+
+  <label>Contenuto
+    <textarea name="content" rows="12" required></textarea>
+  </label>
+
+  <label>Commento editoriale (facoltativo)
+    <textarea name="editor_comment" rows="4"></textarea>
+  </label>
+
+  <button type="submit">Pubblica</button>
+</form>
+{% endblock %}

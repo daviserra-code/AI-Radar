@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="section-header">
+  <h1>Categoria: {{ category.name }}</h1>
+  <p>Articoli filtrati per questa area dell’ecosistema AI / LLM.</p>
+</section>
+
+<div class="article-grid">
+  {% for article in articles %}
+  <article class="card">
+    <div class="card-header">
+      <div class="badge-row">
+        <span class="pill pill-category">
+          {% if article.category %}
+            {{ article.category.name }}
+          {% else %}
+            Generale
+          {% endif %}
+        </span>
+        {% if article.ai_generated %}
+          <span class="pill pill-ai">AI generated</span>
+        {% else %}
+          <span class="pill pill-editorial">Editoriale</span>
+        {% endif %}
+      </div>
+      <h2 class="card-title">
+        <a href="/article/{{ article.slug }}">{{ article.title }}</a>
+      </h2>
+    </div>
+
+    <p class="summary">{{ article.summary or article.content[:220] ~ "..." }}</p>
+
+    <div class="meta meta-bottom">
+      <span class="date">{{ article.created_at.strftime("%Y-%m-%d") }}</span>
+      {% if article.source_url %}
+      <span class="source-link">
+        <a href="{{ article.source_url }}" target="_blank">Fonte</a>
+      </span>
+      {% endif %}
+    </div>
+  </article>
+  {% endfor %}
+</div>
+
+{% endblock %}

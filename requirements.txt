@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+SQLAlchemy
+jinja2
+python-multipart
+python-slugify
+feedparser
+ollama
+requests
+psycopg2-binary
+

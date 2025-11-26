@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Portal Logo Concepts</title>
+    <style>
+        body {
+            background-color: #0f1115; /* Dark Theme Background */
+            font-family: 'Courier New', Courier, monospace;
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px;
+        }
+        .container {
+            display: flex;
+            gap: 50px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .logo-card {
+            background: #1a1d24;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            transition: transform 0.3s, border-color 0.3s;
+            width: 300px;
+        }
+        .logo-card:hover {
+            transform: translateY(-5px);
+            border-color: #00F3FF;
+            box-shadow: 0 10px 30px rgba(0, 243, 255, 0.1);
+        }
+        h3 { margin-top: 20px; font-size: 1.2rem; }
+        p { color: #888; font-size: 0.8rem; margin-top: 5px; }
+        
+        /* Font styles for logos */
+        .font-mono { font-family: 'Courier New', monospace; letter-spacing: -1px; }
+        .font-sans { font-family: Arial, Helvetica, sans-serif; letter-spacing: 1px; }
+        .font-bold { font-weight: 800; }
+    </style>
+</head>
+<body>
+
+    <h1>AI PORTAL // LOGO CONCEPTS</h1>
+    <p style="margin-bottom: 50px; color: #666;">Rendered via SVG Code</p>
+
+    <div class="container">
+
+        <div class="logo-card">
+            <svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+                <g transform="translate(20, 30)">
+                    <circle cx="0" cy="0" r="18" fill="none" stroke="#333" stroke-width="2"/>
+                    <circle cx="0" cy="0" r="10" fill="none" stroke="#00F3FF" stroke-width="2" opacity="0.6"/>
+                    <circle cx="0" cy="0" r="4" fill="#00F3FF">
+                        <animate attributeName="opacity" values="1;0.2;1" dur="2s" repeatCount="indefinite"/>
+                    </circle>
+                    <path d="M0,0 L14,-14 A18,18 0 0,1 18,0" fill="url(#grad1)" opacity="0.8">
+                         <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="3s" repeatCount="indefinite"/>
+                    </path>
+                </g>
+                <text x="55" y="38" fill="white" font-family="Arial, sans-serif" font-weight="bold" font-size="20">AI<tspan fill="#00F3FF">-RADAR</tspan>.it</text>
+                
+                <defs>
+                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#00F3FF;stop-opacity:0" />
+                        <stop offset="100%" style="stop-color:#00F3FF;stop-opacity:0.5" />
+                    </linearGradient>
+                </defs>
+            </svg>
+            <h3>Concept 1: The Pulse</h3>
+            <p>Nome: AI-Radar.it<br>Vibe: News, Velocità, Scansione.</p>
+        </div>
+
+        <div class="logo-card">
+            <svg width="240" height="60" viewBox="0 0 240 60" xmlns="http://www.w3.org/2000/svg">
+                <g transform="translate(30, 30)">
+                    <path d="M0,-15 L15,-7 L15,10 L0,18 L-15,10 L-15,-7 Z" fill="none" stroke="#00F3FF" stroke-width="2" stroke-linejoin="round"/>
+                    <path d="M-15,-7 L0,0 L15,-7" fill="none" stroke="#00F3FF" stroke-width="1" opacity="0.5"/>
+                    <path d="M0,0 L0,18" fill="none" stroke="#00F3FF" stroke-width="1" opacity="0.5"/>
+                    <rect x="-4" y="-2" width="8" height="8" fill="#39FF14" rx="1">
+                        <animate attributeName="fill-opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"/>
+                    </rect>
+                </g>
+                <text x="60" y="36" fill="#39FF14" font-family="'Courier New', monospace" font-weight="bold" font-size="22">LLM</text>
+                <text x="105" y="36" fill="white" font-family="'Courier New', monospace" font-size="20">OnPremise</text>
+            </svg>
+            <h3>Concept 2: The Core</h3>
+            <p>Nome: LLMonPremise.com<br>Vibe: Hardware, Solidità, Locale.</p>
+        </div>
+
+        <div class="logo-card">
+            <svg width="220" height="60" viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg">
+                <g transform="translate(25, 30)">
+                    <path d="M-12,-8 L-18,0 L-12,8" fill="none" stroke="#BD00FF" stroke-width="3" stroke-linecap="round"/>
+                    <path d="M12,-8 L18,0 L12,8" fill="none" stroke="#BD00FF" stroke-width="3" stroke-linecap="round"/>
+                    <polygon points="0,-6 5,-3 5,3 0,6 -5,3 -5,-3" fill="#00F3FF"/>
+                </g>
+                <text x="55" y="37" fill="white" font-family="Arial, sans-serif" font-weight="bold" font-size="18" letter-spacing="1">INHOUSE</text>
+                <text x="145" y="37" fill="#BD00FF" font-family="Arial, sans-serif" font-weight="bold" font-size="18" letter-spacing="0">LLMs</text>
+            </svg>
+            <h3>Concept 3: The Watcher</h3>
+            <p>Nome: Inhouse-LLMs.com<br>Vibe: Sicurezza, Controllo, Analisi.</p>
+        </div>
+
+    </div>
+</body>
+</html>

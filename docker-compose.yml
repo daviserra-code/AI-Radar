@@ -1,0 +1,58 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: llmobs_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: llmobs_db
+      POSTGRES_USER: llmobs_user
+      POSTGRES_PASSWORD: llmobs_pass
+    volumes:
+      - llmobs_pgdata:/var/lib/postgresql/data
+    ports:
+      # opzionale: se vuoi collegarti al DB dall'host
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U llmobs_user -d llmobs_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ainetwork
+
+  app:
+    build: .
+    container_name: llmobs_app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # FastAPI userà questa URL in app/database.py
+      DATABASE_URL: postgresql+psycopg2://llmobs_user:llmobs_pass@db:5432/llmobs_db
+
+      # Qui puntiamo al container esistente "ollama" sulla stessa network
+      OLLAMA_HOST: http://ollama:11434
+
+      # QUI il modello che hai nel tuo container:
+      OLLAMA_MODEL: "llama3.2:latest"
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    command: >
+      uvicorn app.main:app
+      --host 0.0.0.0
+      --port 8000
+      --reload
+    networks:
+      - ainetwork
+
+volumes:
+  llmobs_pgdata:
+
+networks:
+  ainetwork:
+    external: true
