@@ -62,7 +62,15 @@
           <a href="/category/frameworks">Frameworks</a>
           <a href="/category/hardware">Hardware</a>
           <a href="/ask" class="nav-pill-disabled">Ask Observatory</a>
-          <a href="/admin/new" class="nav-cta">+ Editorial / Post</a>
+          {% if current_user %}
+            {% if current_user.is_admin %}
+              <a href="/admin/new" class="nav-cta">+ Editorial / Post</a>
+            {% endif %}
+            <a href="/logout" style="color: var(--text-muted);">Logout (@{{ current_user.username }})</a>
+          {% else %}
+            <a href="/login">Login</a>
+            <a href="/register" class="nav-cta">Register</a>
+          {% endif %}
         </nav>
 
         <!-- SEARCH -->

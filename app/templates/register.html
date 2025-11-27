@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Register // AI Observatory{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 500px; margin: 3rem auto;">
+    <h1 style="margin-bottom: 2rem; text-align: center;">📝 Registrazione</h1>
+    
+    {% if error %}
+    <div style="padding: 1rem; background: rgba(255, 50, 50, 0.1); border: 1px solid rgba(255, 50, 50, 0.3); border-radius: 8px; margin-bottom: 1.5rem; color: #ff6b6b;">
+        {{ error }}
+    </div>
+    {% endif %}
+    
+    <div style="background: var(--bg-card); border: 1px solid var(--border-dim); border-radius: 8px; padding: 2rem;">
+        <form method="post">
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--text-main); font-weight: 600;">Username</label>
+                <input type="text" name="username" required autocomplete="username"
+                       style="width: 100%; padding: 0.75rem; background: var(--bg-deep); border: 1px solid var(--border-dim); border-radius: 4px; color: var(--text-main); font-family: inherit;">
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--text-main); font-weight: 600;">Email</label>
+                <input type="email" name="email" required autocomplete="email"
+                       style="width: 100%; padding: 0.75rem; background: var(--bg-deep); border: 1px solid var(--border-dim); border-radius: 4px; color: var(--text-main); font-family: inherit;">
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--text-main); font-weight: 600;">Password</label>
+                <input type="password" name="password" required autocomplete="new-password"
+                       style="width: 100%; padding: 0.75rem; background: var(--bg-deep); border: 1px solid var(--border-dim); border-radius: 4px; color: var(--text-main); font-family: inherit;">
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: flex; align-items: center; cursor: pointer;">
+                    <input type="checkbox" name="subscribe" value="true" checked
+                           style="margin-right: 0.5rem; width: 18px; height: 18px;">
+                    <span style="color: var(--text-main);">Attiva subito la subscription (commenti abilitati)</span>
+                </label>
+            </div>
+            
+            <button type="submit" style="width: 100%; padding: 0.75rem; background: var(--neon-cyan); color: #000; border: none; border-radius: 4px; font-weight: 600; font-size: 1rem; cursor: pointer;">
+                Registrati
+            </button>
+        </form>
+        
+        <p style="margin-top: 1.5rem; text-align: center; color: var(--text-muted);">
+            Hai già un account? <a href="/login" style="color: var(--neon-cyan);">Accedi</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

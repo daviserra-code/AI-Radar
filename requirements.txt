@@ -12,4 +12,6 @@ apscheduler
 chromadb
 sentence-transformers
 pydantic[email]
+passlib[bcrypt]
+python-jose[cryptography]
 

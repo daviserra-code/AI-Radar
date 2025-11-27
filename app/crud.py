@@ -85,3 +85,87 @@ def search_articles(db: Session, query: str, limit: int = 50) -> List[models.Art
         .limit(limit)
         .all()
     )
+
+
+# ===== USER MANAGEMENT =====
+
+def create_user(
+    db: Session,
+    username: str,
+    email: str,
+    password: str,
+    is_subscribed: bool = False,
+) -> models.User:
+    """Create a new user with hashed password."""
+    hashed_password = models.User.hash_password(password)
+    user = models.User(
+        username=username,
+        email=email,
+        hashed_password=hashed_password,
+        is_subscribed=is_subscribed,
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def get_user_by_username(db: Session, username: str) -> Optional[models.User]:
+    """Get user by username."""
+    return db.query(models.User).filter(models.User.username == username).first()
+
+
+def get_user_by_email(db: Session, email: str) -> Optional[models.User]:
+    """Get user by email."""
+    return db.query(models.User).filter(models.User.email == email).first()
+
+
+def authenticate_user(db: Session, username: str, password: str) -> Optional[models.User]:
+    """Authenticate user with username and password."""
+    user = get_user_by_username(db, username)
+    if not user or not user.verify_password(password):
+        return None
+    return user
+
+
+# ===== COMMENT MANAGEMENT =====
+
+def create_comment(
+    db: Session,
+    article_id: int,
+    user_id: int,
+    content: str,
+) -> models.Comment:
+    """Create a new comment on an article."""
+    comment = models.Comment(
+        content=content,
+        article_id=article_id,
+        user_id=user_id,
+    )
+    db.add(comment)
+    db.commit()
+    db.refresh(comment)
+    return comment
+
+
+def get_comments_by_article(db: Session, article_id: int) -> List[models.Comment]:
+    """Get all comments for an article, ordered by creation date."""
+    return (
+        db.query(models.Comment)
+        .filter(models.Comment.article_id == article_id)
+        .order_by(models.Comment.created_at.asc())
+        .all()
+    )
+
+
+def delete_comment(db: Session, comment_id: int, user_id: int) -> bool:
+    """Delete a comment if the user owns it."""
+    comment = db.query(models.Comment).filter(
+        models.Comment.id == comment_id,
+        models.Comment.user_id == user_id
+    ).first()
+    if comment:
+        db.delete(comment)
+        db.commit()
+        return True
+    return False
