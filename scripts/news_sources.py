@@ -10,9 +10,28 @@ import feedparser
 
 
 AI_FEEDS = [
+    # Major AI Labs
     "https://openai.com/blog/rss.xml",
     "https://huggingface.co/blog/feed.xml",
     "https://ai.googleblog.com/feeds/posts/default",
+    "https://www.anthropic.com/news/rss.xml",
+    
+    # LLM & ML News
+    "https://blog.langchain.dev/rss.xml",
+    "https://ollama.com/blog/rss.xml",
+    
+    # Tech News (AI focused)
+    "https://techcrunch.com/tag/artificial-intelligence/feed/",
+    "https://www.theverge.com/ai-artificial-intelligence/rss/index.xml",
+    "https://arstechnica.com/tag/artificial-intelligence/feed/",
+    
+    # Developer/Framework News
+    "https://pytorch.org/blog/feed.xml",
+    "https://blog.tensorflow.org/feeds/posts/default",
+    
+    # Hardware & Local AI
+    "https://www.tomshardware.com/feeds/all",
+    "https://www.anandtech.com/rss/",
 ]
 
 

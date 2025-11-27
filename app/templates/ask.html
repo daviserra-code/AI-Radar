@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="section-header">
+  <h2>Ask Observatory</h2>
+  <p>
+    Fai una domanda su LLM on-prem, stack locali, framework o hardware.
+    L’Observer risponde usando gli articoli già presenti in archivio (via RAG).
+  </p>
+</section>
+
+<form class="admin-form" method="post" action="/ask">
+  <label>
+    Domanda
+    <textarea
+      name="question"
+      rows="3"
+      placeholder="Es: Quale mini PC ha senso per far girare llama3.2:latest in locale?"
+    >{{ question or "" }}</textarea>
+  </label>
+  <button type="submit">Chiedi all’Observer</button>
+</form>
+
+{% if answer %}
+<section class="article-detail">
+  <header class="article-header">
+    <h2 class="article-title">Risposta</h2>
+  </header>
+  <div class="article-body">
+    {{ answer.replace('\n', '<br>') | safe }}
+  </div>
+</section>
+
+{% if hits and hits|length %}
+<section class="section-header">
+  <h2>Articoli usati come contesto</h2>
+  <p>Estratti dall’archivio AI Observer che hanno contribuito alla risposta.</p>
+</section>
+
+<section class="news-grid">
+  {% for article in hits %}
+  <article class="card">
+    <div>
+      <div>
+        <span class="card-tag">
+          {% if article.category %}
+            {{ article.category.name }}
+          {% else %}
+            Generale
+          {% endif %}
+        </span>
+        {% if article.ai_generated %}
+          <span class="card-tag card-tag-ai">AI generated</span>
+        {% else %}
+          <span class="card-tag card-tag-secondary">Editoriale</span>
+        {% endif %}
+      </div>
+
+      <h3><a href="/article/{{ article.slug }}">{{ article.title }}</a></h3>
+
+      {% if article.summary %}
+        <p>{{ article.summary }}</p>
+      {% else %}
+        <p>{{ article.content[:260] }}...</p>
+      {% endif %}
+    </div>
+
+    <div class="card-meta">
+      <span>{{ article.created_at.strftime("%Y-%m-%d") }}</span>
+      {% if article.source_url %}
+        <span><a href="{{ article.source_url }}" target="_blank">Fonte</a></span>
+      {% else %}
+        <span></span>
+      {% endif %}
+    </div>
+  </article>
+  {% endfor %}
+</section>
+{% endif %}
+{% endif %}
+
+{% endblock %}

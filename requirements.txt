@@ -8,4 +8,8 @@ feedparser
 ollama
 requests
 psycopg2-binary
+apscheduler
+chromadb
+sentence-transformers
+pydantic[email]
 

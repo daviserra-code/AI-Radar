@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from typing import List, Optional
 from datetime import datetime
 from slugify import slugify
@@ -64,3 +65,23 @@ def get_article_by_slug(db: Session, slug: str) -> Optional[models.Article]:
 
 def get_category_by_slug(db: Session, slug: str) -> Optional[models.Category]:
     return db.query(models.Category).filter(models.Category.slug == slug).first()
+
+
+def search_articles(db: Session, query: str, limit: int = 50) -> List[models.Article]:
+    """
+    Ricerca semplice case-insensitive su titolo, summary e content.
+    """
+    q = f"%{query}%"
+    return (
+        db.query(models.Article)
+        .filter(
+            or_(
+                models.Article.title.ilike(q),
+                models.Article.summary.ilike(q),
+                models.Article.content.ilike(q),
+            )
+        )
+        .order_by(models.Article.created_at.desc())
+        .limit(limit)
+        .all()
+    )

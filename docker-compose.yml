@@ -9,6 +9,7 @@ services:
       POSTGRES_DB: llmobs_db
       POSTGRES_USER: llmobs_user
       POSTGRES_PASSWORD: llmobs_pass
+      
     volumes:
       - llmobs_pgdata:/var/lib/postgresql/data
     ports:
@@ -32,6 +33,7 @@ services:
     environment:
       # FastAPI userà questa URL in app/database.py
       DATABASE_URL: postgresql+psycopg2://llmobs_user:llmobs_pass@db:5432/llmobs_db
+      INGEST_INTERVAL_MINUTES: "5"  # ogni 3 ore, per esempio
 
       # Qui puntiamo al container esistente "ollama" sulla stessa network
       OLLAMA_HOST: http://ollama:11434
@@ -56,3 +58,4 @@ volumes:
 networks:
   ainetwork:
     external: true
+

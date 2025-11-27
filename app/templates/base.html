@@ -2,40 +2,93 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <title>{{ page_title or "AI Observatory" }}</title>
+  <title>{{ page_title or "AI-RADAR" }}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="/static/styles.css" />
-  <!-- Facoltativo: se vuoi davvero Inter / JetBrains da webfonts
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  -->
 </head>
 <body>
   <header>
-    <div class="container nav-flex">
-      <div class="logo-container">
-        <div class="logo-title">AI<span> Observatory</span></div>
-        <div class="logo-subtitle">Local &amp; On-Prem LLM Radar</div>
+    <div class="container">
+      <div class="nav-flex">
+        <!-- BLOCCO LOGO PRINCIPALE: AI-RADAR -->
+        <div class="logo-block">
+          <div style="display:flex; align-items:center; gap:0.8rem;">
+            <!-- SVG CONCEPT 1: AI-RADAR -->
+            <svg width="190" height="50" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+              <g transform="translate(20, 30)">
+                  <circle cx="0" cy="0" r="18" fill="none" stroke="#333" stroke-width="2"/>
+                  <circle cx="0" cy="0" r="10" fill="none" stroke="#00F3FF" stroke-width="2" opacity="0.6"/>
+                  <circle cx="0" cy="0" r="4" fill="#00F3FF">
+                      <animate attributeName="opacity" values="1;0.2;1" dur="2s" repeatCount="indefinite"/>
+                  </circle>
+                  <path d="M0,0 L14,-14 A18,18 0 0,1 18,0" fill="url(#grad1)" opacity="0.8">
+                       <animateTransform attributeName="transform"
+                                         type="rotate"
+                                         from="0 0 0"
+                                         to="360 0 0"
+                                         dur="3s"
+                                         repeatCount="indefinite"/>
+                  </path>
+              </g>
+              <text x="55" y="38"
+                    fill="white"
+                    font-family="Arial, sans-serif"
+                    font-weight="bold"
+                    font-size="20">
+                AI<tspan fill="#00F3FF">-RADAR</tspan>.it
+              </text>
+              <defs>
+                  <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" style="stop-color:#00F3FF;stop-opacity:0" />
+                      <stop offset="100%" style="stop-color:#00F3FF;stop-opacity:0.5" />
+                  </linearGradient>
+              </defs>
+            </svg>
+
+            <!-- MICRO TAGLINE TESTUALE -->
+            <div>
+              <div class="logo-main mono-font">AI-RADAR.it</div>
+              <div class="logo-sub">
+                News &amp; analisi per LLM locali, stack e hardware on-prem.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NAV -->
+        <nav class="nav-links">
+          <a href="/">Home</a>
+          <a href="/category/llm">LLM</a>
+          <a href="/category/frameworks">Frameworks</a>
+          <a href="/category/hardware">Hardware</a>
+          <a href="/ask" class="nav-pill-disabled">Ask Observatory</a>
+          <a href="/admin/new" class="nav-cta">+ Editorial / Post</a>
+        </nav>
+
+        <!-- SEARCH -->
+        <form class="search-form" method="get" action="/search">
+          <input
+            class="search-input"
+            type="text"
+            name="q"
+            placeholder="Search LLM, framework, hardware..."
+            value="{{ request.query_params.get('q') or '' }}"
+          />
+          <button class="search-btn" type="submit">Search</button>
+        </form>
       </div>
-      <nav class="nav-links">
-        <a href="/">Home</a>
-        <a href="/category/llm">LLM</a>
-        <a href="/category/frameworks">Frameworks</a>
-        <a href="/category/hardware">Hardware</a>
-        <a href="#" class="nav-disabled">Ask Observatory (soon)</a>
-        <a href="/admin/new" class="nav-cta">+ Editorial / Post</a>
-      </nav>
     </div>
   </header>
 
-  <main class="container">
-    {% block content %}{% endblock %}
+  <main>
+    <div class="container">
+      {% block content %}{% endblock %}
+    </div>
   </main>
 
-  <footer class="site-footer">
+  <footer>
     <div class="container">
-      AI Observatory (code name) • Local / On-Prem AI stack, LLMs &amp; editorial takes by Davide
+      AI-RADAR.it · LLM on-premise, stack locali e analisi editoriali.
     </div>
   </footer>
 </body>

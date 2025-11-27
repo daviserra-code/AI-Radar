@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="section-header">
+  {% if query %}
+    <h2>Risultati per: “{{ query }}”</h2>
+    <p>
+      Articoli che contengono il termine cercato nel titolo, nel riassunto o nel contenuto.
+    </p>
+  {% else %}
+    <h2>Ricerca</h2>
+    <p>Digita qualcosa nel box in alto per cercare tra gli articoli.</p>
+  {% endif %}
+</section>
+
+{% if query %}
+  {% if articles %}
+  <section class="news-grid">
+    {% for article in articles %}
+    <article class="card">
+      <div>
+        <div>
+          <span class="card-tag">
+            {% if article.category %}
+              {{ article.category.name }}
+            {% else %}
+              Generale
+            {% endif %}
+          </span>
+          {% if article.ai_generated %}
+            <span class="card-tag card-tag-ai">AI generated</span>
+          {% else %}
+            <span class="card-tag card-tag-secondary">Editoriale</span>
+          {% endif %}
+        </div>
+
+        <h3>
+          <a href="/article/{{ article.slug }}">{{ article.title }}</a>
+        </h3>
+
+        {% if article.summary %}
+          <p>{{ article.summary }}</p>
+        {% else %}
+          <p>{{ article.content[:260] }}...</p>
+        {% endif %}
+      </div>
+
+      <div class="card-meta">
+        <span>{{ article.created_at.strftime("%Y-%m-%d") }}</span>
+        {% if article.source_url %}
+        <span><a href="{{ article.source_url }}" target="_blank">Fonte</a></span>
+        {% else %}
+        <span></span>
+        {% endif %}
+      </div>
+    </article>
+    {% endfor %}
+  </section>
+  {% else %}
+    <p>Nessun articolo trovato per questa ricerca.</p>
+  {% endif %}
+{% endif %}
+
+{% endblock %}

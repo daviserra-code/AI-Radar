@@ -2,59 +2,115 @@
 {% block content %}
 
 <section class="hero">
-  <div class="hero-kicker">AI / LLM ON-PREM &bull; STACK LOCALE</div>
-  <h1 class="hero-title">
-    Radar tecnico su LLM <span>locali</span>, framework e hardware da laboratorio casalingo.
-  </h1>
-  <p class="hero-subtitle">
-    Notizie generate dall’AI, filtrate su ciò che interessa davvero a chi costruisce e fa girare
-    modelli in casa: miniPC, GPU, framework, orchestrazione e un pizzico di ironia editoriale.
-  </p>
-  <div class="hero-meta-row">
-    <div class="hero-chip">⚙️ Focus: LLM on-prem, inference locale, toolchain dev</div>
-    <div class="hero-chip">📡 Ask Observatory &amp; RAG integration in arrivo</div>
+  <div class="hero-main">
+    <h1>AI-RADAR per LLM <span>on-prem</span> &amp; AI in casa</h1>
+    <p>
+      Il radar quotidiano su modelli, framework e hardware per far girare
+      l’AI in locale. LLM, LangChain, Chroma, mini-PC e tutto ciò che serve
+      per un cervello distribuito “in-house”.
+    </p>
+    <div class="hero-chips">
+      <div class="hero-chip">
+        ⚙️ Stack: LLM locali · LangChain · Transformers · ChromaDB · MiniPC · AI boxes
+      </div>
+      <div class="hero-chip hero-chip-secondary">
+        🛰️ Ask Observatory (Q&amp;A + RAG) già collegato all’archivio articoli.
+      </div>
+    </div>
   </div>
+
+  <aside class="hero-side-panel">
+    <div class="hero-side-title">Sezione on-prem / hardware</div>
+    <!-- LOGO SECONDARIO: LLM OnPremise -->
+    <div style="margin-bottom: 0.8rem;">
+      <svg width="190" height="50" viewBox="0 0 240 60" xmlns="http://www.w3.org/2000/svg">
+        <g transform="translate(30, 30)">
+            <path d="M0,-15 L15,-7 L15,10 L0,18 L-15,10 L-15,-7 Z"
+                  fill="none"
+                  stroke="#00F3FF"
+                  stroke-width="2"
+                  stroke-linejoin="round"/>
+            <path d="M-15,-7 L0,0 L15,-7"
+                  fill="none"
+                  stroke="#00F3FF"
+                  stroke-width="1"
+                  opacity="0.5"/>
+            <path d="M0,0 L0,18"
+                  fill="none"
+                  stroke="#00F3FF"
+                  stroke-width="1"
+                  opacity="0.5"/>
+            <rect x="-4" y="-2" width="8" height="8" fill="#39FF14" rx="1">
+                <animate attributeName="fill-opacity"
+                         values="0.5;1;0.5"
+                         dur="1.5s"
+                         repeatCount="indefinite"/>
+            </rect>
+        </g>
+        <text x="60" y="36"
+              fill="#39FF14"
+              font-family="'Courier New', monospace"
+              font-weight="bold"
+              font-size="22">LLM</text>
+        <text x="105" y="36"
+              fill="white"
+              font-family="'Courier New', monospace"
+              font-size="20">OnPremise</text>
+      </svg>
+    </div>
+
+    <ul class="hero-list">
+      <li>• Scelte di mini-PC e AI boxes per modelli da 3B a 14B+ parametri.</li>
+      <li>• Trade-off tra GPU, RAM e consumi per uso “home lab”.</li>
+      <li>• Note editoriali su build reali, non solo slide da vendor.</li>
+    </ul>
+  </aside>
 </section>
 
 <section class="section-header">
-  <h2>Ultime dal radar</h2>
-  <p>Feed automatici + layer di riscrittura LLM, pronti per i tuoi commenti editoriali.</p>
+  <h2>Ultime analisi &amp; news dal radar</h2>
+  <p>
+    Articoli generati dall’AI sulla base dei feed, con spazio per layer
+    editoriale umano sopra il contenuto grezzo.
+  </p>
 </section>
 
 <section class="news-grid">
   {% for article in articles %}
   <article class="card">
-    <div class="card-top-row">
+    <div>
       <div>
-        {% if article.category %}
-          <span class="card-tag">{{ article.category.name }}</span>
-        {% else %}
-          <span class="card-tag">Generale</span>
-        {% endif %}
-      </div>
-      <div class="card-badge-secondary">
+        <span class="card-tag">
+          {% if article.category %}
+            {{ article.category.name }}
+          {% else %}
+            Generale
+          {% endif %}
+        </span>
         {% if article.ai_generated %}
           <span class="card-tag card-tag-ai">AI generated</span>
         {% else %}
-          <span class="card-tag card-tag-editorial">Editoriale</span>
+          <span class="card-tag card-tag-secondary">Editoriale</span>
         {% endif %}
       </div>
+
+      <h3>
+        <a href="/article/{{ article.slug }}">{{ article.title }}</a>
+      </h3>
+
+      {% if article.summary %}
+        <p>{{ article.summary }}</p>
+      {% else %}
+        <p>{{ article.content[:260] }}...</p>
+      {% endif %}
     </div>
-
-    <h3>
-      <a href="/article/{{ article.slug }}">{{ article.title }}</a>
-    </h3>
-
-    {% if article.summary %}
-      <p>{{ article.summary }}</p>
-    {% else %}
-      <p>{{ article.content[:260] }}...</p>
-    {% endif %}
 
     <div class="card-meta">
       <span>{{ article.created_at.strftime("%Y-%m-%d") }}</span>
       {% if article.source_url %}
       <span><a href="{{ article.source_url }}" target="_blank">Fonte</a></span>
+      {% else %}
+      <span></span>
       {% endif %}
     </div>
   </article>
