@@ -1,11 +1,9 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from passlib.context import CryptContext
+import bcrypt
 
 from .database import Base
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class Category(Base):
@@ -57,11 +55,13 @@ class User(Base):
     comments = relationship("Comment", back_populates="user", cascade="all, delete-orphan")
 
     def verify_password(self, password: str) -> bool:
-        return pwd_context.verify(password, self.hashed_password)
+        return bcrypt.checkpw(password.encode('utf-8'), self.hashed_password.encode('utf-8'))
 
     @staticmethod
     def hash_password(password: str) -> str:
-        return pwd_context.hash(password)
+        salt = bcrypt.gensalt()
+        hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+        return hashed.decode('utf-8')
 
 
 class Comment(Base):
