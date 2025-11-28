@@ -26,6 +26,7 @@ def create_article(
     content: str,
     category_name: str,
     source_url: Optional[str] = None,
+    image_url: Optional[str] = None,
     editor_comment: Optional[str] = None,
     ai_generated: bool = True,
 ) -> models.Article:
@@ -39,6 +40,7 @@ def create_article(
         content=content,
         category_id=category.id,
         source_url=source_url,
+        image_url=image_url,
         editor_comment=editor_comment,
         ai_generated=ai_generated,
         created_at=datetime.utcnow(),

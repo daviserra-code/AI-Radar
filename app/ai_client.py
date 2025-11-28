@@ -74,7 +74,13 @@ TESTO:
 
 1. Riscrivi un titolo chiaro e tecnico in massimo 90 caratteri.
 2. Scrivi un riassunto in 2-3 frasi (max ~80 parole) che spieghi il punto chiave.
-3. Scrivi un contenuto esteso in italiano (400-700 parole) con tono informativo, neutro.
+3. Scrivi un contenuto esteso e DETTAGLIATO in italiano (800-1500 parole) con:
+   - Introduzione con contesto
+   - Sezioni con sottotitoli (usa ## per i titoli)
+   - Dettagli tecnici specifici
+   - Implicazioni pratiche
+   - Conclusione con prospettive future
+   - Usa Markdown per formattazione (grassetto, liste, codice)
 4. Scegli UNA sola categoria tra: LLM, Frameworks, Hardware, Market, Altro.
 
 IMPORTANTE:

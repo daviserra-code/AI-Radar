@@ -40,6 +40,7 @@ def ingest_from_feeds():
 
         for item in raw_items:
             link = item["link"]
+            image_url = item.get("image_url", "")
 
             if article_exists_by_source(db, link):
                 print(f"- Già presente, skip: {link}")
@@ -61,6 +62,7 @@ def ingest_from_feeds():
                 content=article_data["content"],
                 category_name=article_data["category"],
                 source_url=link,
+                image_url=image_url if image_url else None,
                 editor_comment=None,
                 ai_generated=True,
             )

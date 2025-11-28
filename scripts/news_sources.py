@@ -38,7 +38,7 @@ AI_FEEDS = [
 def fetch_raw_news(limit_per_feed: int = 5) -> List[Dict[str, str]]:
     """
     Ritorna una lista di dict:
-      { "title": ..., "text": ..., "link": ... }
+      { "title": ..., "text": ..., "link": ..., "image_url": ... }
     per tutte le sorgenti definite in AI_FEEDS.
     """
     items: List[Dict[str, str]] = []
@@ -56,6 +56,20 @@ def fetch_raw_news(limit_per_feed: int = 5) -> List[Dict[str, str]]:
                     content = blocks[0].get("value", "")
             text = (content or summary or "").strip()
 
+            # Try to extract image from various RSS fields
+            image_url = None
+            if hasattr(entry, "media_content") and entry.media_content:
+                image_url = entry.media_content[0].get("url")
+            elif hasattr(entry, "media_thumbnail") and entry.media_thumbnail:
+                image_url = entry.media_thumbnail[0].get("url")
+            elif hasattr(entry, "enclosures") and entry.enclosures:
+                for enclosure in entry.enclosures:
+                    if enclosure.get("type", "").startswith("image/"):
+                        image_url = enclosure.get("href")
+                        break
+            elif hasattr(entry, "image") and entry.image:
+                image_url = entry.image.get("href")
+
             if not title or not text:
                 continue
 
@@ -64,6 +78,7 @@ def fetch_raw_news(limit_per_feed: int = 5) -> List[Dict[str, str]]:
                     "title": title,
                     "text": text,
                     "link": link,
+                    "image_url": image_url or "",
                 }
             )
 

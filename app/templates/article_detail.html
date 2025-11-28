@@ -24,15 +24,32 @@
       <span class="date">Pubblicato il {{ article.created_at.strftime("%Y-%m-%d %H:%M") }}</span>
       {% if article.source_url %}
       <span class="source-link">
-        <a href="{{ article.source_url }}" target="_blank">Fonte originale</a>
+        <a href="{{ article.source_url }}" target="_blank" style="color: var(--neon-cyan); font-weight: 600;">📰 Leggi l'articolo originale →</a>
       </span>
       {% endif %}
     </div>
   </header>
 
+  {% if article.image_url %}
+  <div style="margin: 2rem 0; text-align: center;">
+    <img src="{{ article.image_url }}" alt="{{ article.title }}" 
+         style="max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border-dim);">
+  </div>
+  {% endif %}
+
   <section class="article-body">
     {{ article.content | safe }}
   </section>
+
+  {% if article.source_url %}
+  <div style="margin: 2rem 0; padding: 1.5rem; background: var(--bg-card); border: 1px solid var(--border-dim); border-radius: 8px; text-align: center;">
+    <p style="margin-bottom: 1rem; color: var(--text-muted);">Vuoi approfondire? Leggi l'articolo completo dalla fonte:</p>
+    <a href="{{ article.source_url }}" target="_blank" rel="noopener" 
+       style="display: inline-block; padding: 0.75rem 2rem; background: var(--neon-cyan); color: #000; border-radius: 4px; font-weight: 600; text-decoration: none;">
+      📖 VAI ALLA FONTE ORIGINALE
+    </a>
+  </div>
+  {% endif %}
 
   {% if article.editor_comment %}
   <aside class="editor-comment">
