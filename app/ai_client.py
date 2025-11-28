@@ -33,7 +33,7 @@ def _call_llm(prompt: str) -> str:
         response = ollama.chat(
             model=MODEL_NAME,
             messages=[
-                {"role": "system", "content": "Rispondi sempre in italiano."},
+                {"role": "system", "content": "You are a professional tech journalist. Write clear, accurate, and grammatically correct articles in English."},
                 {"role": "user", "content": prompt},
             ],
             stream=False,
@@ -58,50 +58,51 @@ def build_news_prompt(raw_title: str, raw_text: str) -> str:
       - categoria macro (LLM / Frameworks / Hardware / Market / Altro)
     """
     return f"""
-Sei un analista di notizie specializzato in intelligenza artificiale.
+You are a professional AI and technology news analyst.
 
-Ho questa notizia grezza (titolo + testo).
+I have this raw news article (title + text).
 
-TITOLO:
-[INIZIO_TITOLO]
+TITLE:
+[START_TITLE]
 {raw_title}
-[FINE_TITOLO]
+[END_TITLE]
 
-TESTO:
-[INIZIO_TESTO]
+TEXT:
+[START_TEXT]
 {raw_text}
-[FINE_TESTO]
+[END_TEXT]
 
-1. Riscrivi un titolo chiaro e tecnico in massimo 90 caratteri.
-2. Scrivi un riassunto in 2-3 frasi (max ~80 parole) che spieghi il punto chiave.
-3. Scrivi un contenuto esteso e DETTAGLIATO in italiano (800-1500 parole) con:
-   - Introduzione con contesto
-   - Sezioni con sottotitoli (usa ## per i titoli)
-   - Dettagli tecnici specifici
-   - Implicazioni pratiche
-   - Conclusione con prospettive future
-   - Usa Markdown per formattazione (grassetto, liste, codice)
-4. Scegli UNA sola categoria tra: LLM, Frameworks, Hardware, Market, Altro.
+1. Rewrite a clear, technical title in maximum 90 characters.
+2. Write a summary in 2-3 sentences (max ~80 words) explaining the key point.
+3. Write an extended and DETAILED article in English (800-1500 words) with:
+   - Introduction with context
+   - Sections with subheadings (use ## for headers)
+   - Specific technical details
+   - Practical implications
+   - Conclusion with future outlook
+   - Use Markdown formatting (bold, lists, code)
+4. Choose ONE category from: LLM, Frameworks, Hardware, Market, Other.
 
-IMPORTANTE:
-- Rispondi SOLO in JSON valido.
-- Nessun commento fuori dal JSON, nessun testo prima o dopo.
-- Usa esattamente queste chiavi: "title", "summary", "content", "category".
-- NON usare backticks (`) nel JSON, usa solo virgolette doppie (").
-- Il campo "content" deve essere una SINGOLA STRINGA, NON un oggetto o array.
-- Usa \\n per le newline nella stringa del content.
-- NON usare triple-quotes o altri delimitatori speciali.
+IMPORTANT:
+- Reply ONLY with valid JSON.
+- No comments outside JSON, no text before or after.
+- Use exactly these keys: "title", "summary", "content", "category".
+- DO NOT use backticks (`) in JSON, use only double quotes (").
+- The "content" field must be a SINGLE STRING, NOT an object or array.
+- Use \\n for newlines in the content string.
+- DO NOT use triple-quotes or other special delimiters.
+- Write in clear, grammatically correct English.
 
-Esempio di formato (rispetta esattamente questo schema):
+Format example (follow this schema exactly):
 
 {{
-  "title": "Titolo breve...",
-  "summary": "Riassunto in 2-3 frasi...",
-  "content": "## Introduzione\\n\\nContenuto lungo con sezioni...\\n\\n## Dettagli\\n\\nAltro contenuto...\\n\\n## Conclusione\\n\\nContenutofinal...",
+  "title": "Short title...",
+  "summary": "Summary in 2-3 sentences...",
+  "content": "## Introduction\\n\\nLong content with sections...\\n\\n## Details\\n\\nMore content...\\n\\n## Conclusion\\n\\nFinal content...",
   "category": "LLM"
 }}
 
-RICORDA: "content" è una STRINGA, not un oggetto!
+REMEMBER: "content" is a STRING, not an object!
 """
 
 
