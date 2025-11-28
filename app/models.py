@@ -26,6 +26,11 @@ class Article(Base):
     content = Column(Text, nullable=False)
     source_url = Column(String(500), nullable=True)
     image_url = Column(String(500), nullable=True)
+    
+    # English translations
+    title_en = Column(String(255), nullable=True)
+    summary_en = Column(Text, nullable=True)
+    content_en = Column(Text, nullable=True)
 
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow)

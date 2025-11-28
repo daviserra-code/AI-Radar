@@ -20,6 +20,14 @@
 
     <h1 class="article-title">{{ article.title }}</h1>
 
+    {% if article.title_en %}
+    <div style="margin: 1rem 0;">
+      <button id="langToggle" onclick="toggleLanguage()" style="padding: 0.5rem 1rem; background: var(--bg-card); color: var(--neon-cyan); border: 1px solid var(--neon-cyan); border-radius: 4px; cursor: pointer; font-weight: 600;">
+        🌐 Show in English
+      </button>
+    </div>
+    {% endif %}
+
     <div class="meta meta-article">
       <span class="date">Pubblicato il {{ article.created_at.strftime("%Y-%m-%d %H:%M") }}</span>
       {% if article.source_url %}
@@ -37,8 +45,15 @@
   </div>
   {% endif %}
 
-  <section class="article-body">
-    {{ article.content | safe }}
+  <section class="article-body" id="articleContent">
+    <div id="contentIt" style="display: block;">
+      {{ article.content | safe }}
+    </div>
+    {% if article.content_en %}
+    <div id="contentEn" style="display: none;">
+      {{ article.content_en | safe }}
+    </div>
+    {% endif %}
   </section>
 
   {% if article.source_url %}
@@ -119,5 +134,29 @@
     </div>
   </section>
 </article>
+
+{% if article.content_en %}
+<script>
+let currentLang = 'it';
+
+function toggleLanguage() {
+  const contentIt = document.getElementById('contentIt');
+  const contentEn = document.getElementById('contentEn');
+  const button = document.getElementById('langToggle');
+  
+  if (currentLang === 'it') {
+    contentIt.style.display = 'none';
+    contentEn.style.display = 'block';
+    button.textContent = '🇮🇹 Mostra in Italiano';
+    currentLang = 'en';
+  } else {
+    contentIt.style.display = 'block';
+    contentEn.style.display = 'none';
+    button.textContent = '🌐 Show in English';
+    currentLang = 'it';
+  }
+}
+</script>
+{% endif %}
 
 {% endblock %}

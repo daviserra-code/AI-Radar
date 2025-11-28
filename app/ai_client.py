@@ -33,7 +33,7 @@ def _call_llm(prompt: str) -> str:
         response = ollama.chat(
             model=MODEL_NAME,
             messages=[
-                {"role": "system", "content": "You are a professional tech journalist. Write clear, accurate, and grammatically correct articles in English."},
+                {"role": "system", "content": "Sei un giornalista tecnologico professionista. Scrivi articoli chiari, accurati e grammaticalmente corretti in italiano. Usa un linguaggio naturale e fluente, evitando traduzioni letterali dall'inglese."},
                 {"role": "user", "content": prompt},
             ],
             stream=False,
@@ -58,51 +58,55 @@ def build_news_prompt(raw_title: str, raw_text: str) -> str:
       - categoria macro (LLM / Frameworks / Hardware / Market / Altro)
     """
     return f"""
-You are a professional AI and technology news analyst.
+Sei un analista esperto di notizie su AI e tecnologia.
 
-I have this raw news article (title + text).
+Ho questo articolo grezzo (titolo + testo).
 
-TITLE:
-[START_TITLE]
+TITOLO:
+[INIZIO_TITOLO]
 {raw_title}
-[END_TITLE]
+[FINE_TITOLO]
 
-TEXT:
-[START_TEXT]
+TESTO:
+[INIZIO_TESTO]
 {raw_text}
-[END_TEXT]
+[FINE_TESTO]
 
-1. Rewrite a clear, technical title in maximum 90 characters.
-2. Write a summary in 2-3 sentences (max ~80 words) explaining the key point.
-3. Write an extended and DETAILED article in English (800-1500 words) with:
-   - Introduction with context
-   - Sections with subheadings (use ## for headers)
-   - Specific technical details
-   - Practical implications
-   - Conclusion with future outlook
-   - Use Markdown formatting (bold, lists, code)
-4. Choose ONE category from: LLM, Frameworks, Hardware, Market, Other.
+Crea DUE versioni complete dell'articolo: una in ITALIANO e una in INGLESE.
 
-IMPORTANT:
-- Reply ONLY with valid JSON.
-- No comments outside JSON, no text before or after.
-- Use exactly these keys: "title", "summary", "content", "category".
-- DO NOT use backticks (`) in JSON, use only double quotes (").
-- The "content" field must be a SINGLE STRING, NOT an object or array.
-- Use \\n for newlines in the content string.
-- DO NOT use triple-quotes or other special delimiters.
-- Write in clear, grammatically correct English.
+1. Titolo chiaro e tecnico (max 90 caratteri) in ITALIANO e INGLESE
+2. Riassunto in 2-3 frasi (max 80 parole) in ITALIANO e INGLESE
+3. Articolo esteso e DETTAGLIATO (800-1500 parole) in ITALIANO e INGLESE con:
+   - Introduzione con contesto
+   - Sezioni con sottotitoli (usa ## per le intestazioni)
+   - Dettagli tecnici specifici
+   - Implicazioni pratiche
+   - Conclusione con prospettive future
+   - Usa formattazione Markdown (grassetto, liste, codice)
+4. Scegli UNA categoria tra: LLM, Frameworks, Hardware, Market, Other.
 
-Format example (follow this schema exactly):
+IMPORTANTE:
+- Rispondi SOLO con JSON valido.
+- Nessun commento fuori dal JSON.
+- Usa esattamente queste chiavi: "title", "title_en", "summary", "summary_en", "content", "content_en", "category".
+- NON usare backticks (`) nel JSON, solo virgolette doppie (").
+- I campi "content" e "content_en" devono essere STRINGHE, NON oggetti.
+- Usa \\n per i newline.
+- Scrivi italiano naturale e fluente, non traduzione letterale.
+
+Esempio formato (segui questo schema esattamente):
 
 {{
-  "title": "Short title...",
-  "summary": "Summary in 2-3 sentences...",
-  "content": "## Introduction\\n\\nLong content with sections...\\n\\n## Details\\n\\nMore content...\\n\\n## Conclusion\\n\\nFinal content...",
+  "title": "Titolo in italiano...",
+  "title_en": "Title in English...",
+  "summary": "Riassunto in italiano...",
+  "summary_en": "Summary in English...",
+  "content": "## Introduzione\\n\\nContenuto lungo in italiano...\\n\\n## Dettagli\\n\\nAltro contenuto...",
+  "content_en": "## Introduction\\n\\nLong content in English...\\n\\n## Details\\n\\nMore content...",
   "category": "LLM"
 }}
 
-REMEMBER: "content" is a STRING, not an object!
+RICORDA: "content" e "content_en" sono STRINGHE!
 """
 
 
@@ -189,10 +193,30 @@ def generate_article_from_news(raw_title: str, raw_text: str) -> Dict[str, str]:
         content = "\n\n".join(parts)
     elif not isinstance(content, str):
         content = str(content)
+    
+    # Same handling for English content
+    content_en = data.get("content_en", "")
+    if isinstance(content_en, dict):
+        parts = []
+        for key, value in content_en.items():
+            if isinstance(value, dict):
+                parts.append(f"## {key.replace('_', ' ').title()}")
+                for subkey, subvalue in value.items():
+                    parts.append(f"### {subkey.replace('_', ' ').title()}")
+                    parts.append(str(subvalue).strip().strip('"""').strip())
+            else:
+                parts.append(f"## {key.replace('_', ' ').title()}")
+                parts.append(str(value).strip().strip('"""').strip())
+        content_en = "\n\n".join(parts)
+    elif not isinstance(content_en, str):
+        content_en = str(content_en)
 
     return {
-        "title": data["title"].strip(),
-        "summary": data["summary"].strip(),
+        "title": data.get("title", "").strip(),
+        "summary": data.get("summary", "").strip(),
         "content": content.strip(),
+        "title_en": data.get("title_en", "").strip(),
+        "summary_en": data.get("summary_en", "").strip(),
+        "content_en": content_en.strip(),
         "category": category,
     }
