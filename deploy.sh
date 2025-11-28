@@ -7,9 +7,18 @@ set -e
 
 echo "🚀 Starting AI-Radar deployment..."
 
+# Stash any local changes (database files, logs, etc.)
+echo "💾 Stashing local changes..."
+git stash --include-untracked || true
+
 # Pull latest changes
 echo "📥 Pulling latest code from GitHub..."
 git pull origin main
+
+# Restore stashed database if it exists
+echo "🔄 Restoring local database..."
+git checkout stash -- chroma_store/chroma.sqlite3 2>/dev/null || true
+git stash drop 2>/dev/null || true
 
 # Stop current containers
 echo "🛑 Stopping current containers..."
