@@ -87,15 +87,21 @@ IMPORTANTE:
 - Rispondi SOLO in JSON valido.
 - Nessun commento fuori dal JSON, nessun testo prima o dopo.
 - Usa esattamente queste chiavi: "title", "summary", "content", "category".
+- NON usare backticks (`) nel JSON, usa solo virgolette doppie (").
+- Il campo "content" deve essere una SINGOLA STRINGA, NON un oggetto o array.
+- Usa \\n per le newline nella stringa del content.
+- NON usare triple-quotes (""") o altri delimitatori speciali.
 
-Esempio di formato (rispetta questo schema):
+Esempio di formato (rispetta esattamente questo schema):
 
 {{
-  "title": "Titolo...",
-  "summary": "Riassunto...",
-  "content": "Contenuto lungo...",
+  "title": "Titolo breve...",
+  "summary": "Riassunto in 2-3 frasi...",
+  "content": "## Introduzione\\n\\nContenuto lungo con sezioni...\\n\\n## Dettagli\\n\\nAltro contenuto...\\n\\n## Conclusione\\n\\nContenutofinal...",
   "category": "LLM"
 }}
+
+RICORDA: "content" è una STRINGA, non un oggetto!
 """
 
 
@@ -103,12 +109,35 @@ def _extract_json_block(text: str) -> str:
     """
     I modelli piccoli a volte si "scordano" di stare zitti.
     Qui cerchiamo il primo '{' e l'ultima '}' e proviamo a estrarre un blocco JSON.
+    Inoltre, rimuoviamo i markdown code blocks se presenti e gestiamo i backticks nei valori.
     """
+    # Rimuovi i markdown code blocks se presenti
+    text = text.replace("```json", "").replace("```", "")
+    
     start = text.find("{")
     end = text.rfind("}")
     if start == -1 or end == -1 or end <= start:
         raise LLMError("Impossibile trovare un blocco JSON nella risposta del modello.")
-    return text[start : end + 1]
+    
+    json_block = text[start : end + 1]
+    
+    # Fix: il modello a volte usa backticks per valori multilinea invece di stringhe JSON valide
+    # Sostituisci pattern come "content": `...` con "content": "..."
+    # Dobbiamo gestire anche il caso multilinea
+    import re
+    
+    # Pattern per trovare "key": `multiline value` e sostituirlo con "key": "escaped value"
+    def replace_backtick_value(match):
+        key = match.group(1)
+        value = match.group(2)
+        # Escape delle virgolette e newline nel valore
+        value = value.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n').replace('\r', '\\r').replace('\t', '\\t')
+        return f'"{key}": "{value}"'
+    
+    # Cerca pattern come "key": `value`
+    json_block = re.sub(r'"(\w+)":\s*`([^`]*)`', replace_backtick_value, json_block, flags=re.DOTALL)
+    
+    return json_block
 
 
 def generate_article_from_news(raw_title: str, raw_text: str) -> Dict[str, str]:
@@ -142,9 +171,27 @@ def generate_article_from_news(raw_title: str, raw_text: str) -> Dict[str, str]:
     else:
         category = "Altro"
 
+    # Gestisci il caso in cui content sia un oggetto invece di una stringa
+    content = data.get("content", "")
+    if isinstance(content, dict):
+        # Se il modello ha restituito un oggetto, converti in stringa markdown
+        parts = []
+        for key, value in content.items():
+            if isinstance(value, dict):
+                parts.append(f"## {key.replace('_', ' ').title()}")
+                for subkey, subvalue in value.items():
+                    parts.append(f"### {subkey.replace('_', ' ').title()}")
+                    parts.append(str(subvalue).strip().strip('"""').strip())
+            else:
+                parts.append(f"## {key.replace('_', ' ').title()}")
+                parts.append(str(value).strip().strip('"""').strip())
+        content = "\n\n".join(parts)
+    elif not isinstance(content, str):
+        content = str(content)
+
     return {
         "title": data["title"].strip(),
         "summary": data["summary"].strip(),
-        "content": data["content"].strip(),
+        "content": content.strip(),
         "category": category,
     }
