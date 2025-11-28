@@ -19,6 +19,7 @@ AI_FEEDS = [
     # LLM & ML News
     "https://blog.langchain.dev/rss.xml",
     "https://ollama.com/blog/rss.xml",
+    "https://alphasignal.ai/rss.xml",
     
     # Tech News (AI focused)
     "https://techcrunch.com/tag/artificial-intelligence/feed/",
