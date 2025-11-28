@@ -90,7 +90,7 @@ IMPORTANTE:
 - NON usare backticks (`) nel JSON, usa solo virgolette doppie (").
 - Il campo "content" deve essere una SINGOLA STRINGA, NON un oggetto o array.
 - Usa \\n per le newline nella stringa del content.
-- NON usare triple-quotes (""") o altri delimitatori speciali.
+- NON usare triple-quotes o altri delimitatori speciali.
 
 Esempio di formato (rispetta esattamente questo schema):
 
@@ -101,7 +101,7 @@ Esempio di formato (rispetta esattamente questo schema):
   "category": "LLM"
 }}
 
-RICORDA: "content" è una STRINGA, non un oggetto!
+RICORDA: "content" è una STRINGA, not un oggetto!
 """
 
 
