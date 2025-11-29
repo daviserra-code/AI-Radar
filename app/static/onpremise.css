@@ -1,0 +1,298 @@
+/* --- LLM ON PREMISE THEME --- */
+/* Server rack aesthetic with green neon and hardware focus */
+
+.llm-onpremise-section {
+    --onprem-green: #39FF14;      /* Primary accent - server/hardware */
+    --onprem-green-dim: rgba(57, 255, 20, 0.2);
+    --onprem-orange: #FF6B35;     /* Warning/status indicator */
+    --rack-metal: #2a2a2a;
+    --rack-border: #444444;
+}
+
+/* LLMOnPremise Header with Server Core Logo */
+.onprem-header {
+    border-bottom: 2px solid var(--rack-border);
+    padding: 1.2rem 0;
+    margin-bottom: 2.5rem;
+    background: linear-gradient(180deg, #0a0a0a 0%, #0f1115 100%);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.onprem-logo-block {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.onprem-logo-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.onprem-logo-main {
+    font-size: 1.3rem;
+    font-weight: 800;
+    font-family: 'Courier New', monospace;
+    letter-spacing: -1px;
+}
+
+.onprem-logo-main .accent-llm {
+    color: var(--onprem-green);
+}
+
+.onprem-logo-sub {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* Server Rack Pattern Background */
+.onprem-hero {
+    background: 
+        linear-gradient(90deg, var(--rack-metal) 1px, transparent 1px),
+        linear-gradient(180deg, var(--rack-metal) 1px, transparent 1px);
+    background-size: 40px 40px;
+    border: 2px solid var(--rack-border);
+    border-radius: 12px;
+    padding: 2.5rem;
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.onprem-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, 
+        var(--onprem-green) 0%, 
+        transparent 50%, 
+        var(--onprem-green) 100%);
+    animation: server-pulse 3s infinite;
+}
+
+@keyframes server-pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+}
+
+.onprem-hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+.onprem-hero h1 {
+    font-size: 2.2rem;
+    margin-bottom: 1rem;
+    color: #fff;
+}
+
+.onprem-hero h1 .highlight {
+    color: var(--onprem-green);
+    text-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+}
+
+.onprem-hero p {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    max-width: 700px;
+    line-height: 1.6;
+}
+
+/* Hardware Status Cards */
+.hardware-card {
+    background: var(--bg-card);
+    border: 1px solid var(--rack-border);
+    border-left: 4px solid var(--onprem-green);
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.hardware-card:hover {
+    border-left-color: var(--onprem-green);
+    border-left-width: 6px;
+    transform: translateX(4px);
+    box-shadow: 0 8px 24px rgba(57, 255, 20, 0.1);
+}
+
+.hardware-card::after {
+    content: '';
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 8px;
+    height: 8px;
+    background: var(--onprem-green);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--onprem-green);
+    animation: status-blink 2s infinite;
+}
+
+@keyframes status-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.hardware-tag {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--onprem-green);
+    background: var(--onprem-green-dim);
+    border: 1px solid var(--onprem-green);
+    padding: 4px 10px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 0.8rem;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.08em;
+}
+
+.hardware-tag.tag-gpu {
+    color: var(--onprem-orange);
+    border-color: var(--onprem-orange);
+    background: rgba(255, 107, 53, 0.15);
+}
+
+/* Server Specs Display */
+.spec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.spec-item {
+    background: var(--rack-metal);
+    border: 1px solid var(--rack-border);
+    border-radius: 6px;
+    padding: 1.2rem;
+    text-align: center;
+}
+
+.spec-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+}
+
+.spec-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--onprem-green);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.spec-unit {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-left: 0.3rem;
+}
+
+/* Navigation Pills - OnPrem Style */
+.onprem-nav-pills {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.onprem-nav-pills a {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    border: 1px solid var(--rack-border);
+    background: var(--rack-metal);
+    transition: all 0.2s;
+}
+
+.onprem-nav-pills a:hover,
+.onprem-nav-pills a.active {
+    color: var(--onprem-green);
+    border-color: var(--onprem-green);
+    background: var(--onprem-green-dim);
+    box-shadow: 0 0 15px rgba(57, 255, 20, 0.2);
+}
+
+/* Hexagon Badge (from logo concept) */
+.hexagon-badge {
+    width: 50px;
+    height: 50px;
+    position: relative;
+    display: inline-block;
+}
+
+.hexagon-badge svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Infrastructure Grid */
+.infra-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+/* Cross-link to AI-Radar */
+.cross-link-banner {
+    background: linear-gradient(135deg, var(--bg-card), var(--rack-metal));
+    border: 1px solid var(--border-dim);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin: 3rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.cross-link-banner .icon {
+    font-size: 2rem;
+}
+
+.cross-link-banner a {
+    color: var(--neon-cyan);
+    text-decoration: none;
+    font-weight: bold;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.2s;
+}
+
+.cross-link-banner a:hover {
+    border-bottom-color: var(--neon-cyan);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .onprem-hero {
+        padding: 1.5rem;
+    }
+    
+    .onprem-hero h1 {
+        font-size: 1.6rem;
+    }
+    
+    .spec-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+    
+    .infra-grid {
+        grid-template-columns: 1fr;
+    }
+}

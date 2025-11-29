@@ -1,0 +1,46 @@
+{% extends "onpremise_base.html" %}
+
+{% block content %}
+
+<div class="section-header">
+  <h1>🔍 Search Results</h1>
+  {% if query %}
+  <p>Risultati per: <strong>{{ query }}</strong></p>
+  {% else %}
+  <p>Inserisci una query per cercare articoli hardware</p>
+  {% endif %}
+</div>
+
+<div class="onpremise-nav-pills">
+  <a href="/llm-onpremise">🏠 Overview</a>
+  <a href="/llm-onpremise/hardware">⚡ Hardware</a>
+  <a href="/llm-onpremise/infrastructure">🔧 Infrastructure</a>
+  <a href="/llm-onpremise/guides">📖 Setup Guides</a>
+</div>
+
+{% if articles %}
+<div class="infra-grid">
+  {% for article in articles %}
+  <div class="hardware-card">
+    <span class="hardware-tag">{{ article.category.name }}</span>
+    
+    <h3><a href="/article/{{ article.id }}">{{ article.title }}</a></h3>
+    <p>{{ article.summary[:200] }}...</p>
+    
+    <div class="card-meta">
+      <span>{{ article.published_at.strftime('%d/%m/%Y') if article.published_at else article.created_at.strftime('%d/%m/%Y') }}</span>
+      <a href="/article/{{ article.id }}">Leggi →</a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% elif query %}
+<div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+  <p style="font-size: 1.2rem;">Nessun risultato trovato per "{{ query }}"</p>
+  <p style="margin-top: 1rem;">
+    <a href="/llm-onpremise" class="btn-tech">← Torna alla home</a>
+  </p>
+</div>
+{% endif %}
+
+{% endblock %}

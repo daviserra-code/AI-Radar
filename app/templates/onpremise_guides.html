@@ -1,0 +1,50 @@
+{% extends "onpremise_base.html" %}
+
+{% block content %}
+
+<div class="section-header">
+  <h1>📖 Setup Guides & Tutorial</h1>
+  <p>Guide passo-passo per configurare il tuo stack LLM on-premise</p>
+</div>
+
+<div class="onpremise-nav-pills">
+  <a href="/llm-onpremise">🏠 Overview</a>
+  <a href="/llm-onpremise/hardware">⚡ Hardware</a>
+  <a href="/llm-onpremise/infrastructure">🔧 Infrastructure</a>
+  <a href="/llm-onpremise/guides" class="active">📖 Setup Guides</a>
+</div>
+
+<div class="onprem-hero" style="margin-bottom: 3rem;">
+  <div class="onprem-hero-content">
+    <h2 style="font-size: 1.4rem; margin-bottom: 1rem;">🚀 Quick Start Checklist</h2>
+    <ul style="list-style: none; padding: 0; font-size: 0.95rem; line-height: 2;">
+      <li>✅ Scegli la GPU adatta (RTX 4070/4090 o superiore)</li>
+      <li>✅ Installa Docker & Docker Compose</li>
+      <li>✅ Configura Ollama per servire i modelli</li>
+      <li>✅ Setup vector database (ChromaDB/Qdrant)</li>
+      <li>✅ Deploy FastAPI backend per RAG</li>
+      <li>✅ Configura monitoring e logging</li>
+    </ul>
+  </div>
+</div>
+
+<div class="infra-grid">
+  {% for article in articles %}
+  <div class="hardware-card">
+    <span class="hardware-tag tag-gpu">GUIDE</span>
+    <span class="hardware-tag">{{ article.category.name }}</span>
+    
+    <h3><a href="/article/{{ article.id }}">{{ article.title }}</a></h3>
+    <p>{{ article.summary[:200] }}...</p>
+    
+    <div class="card-meta">
+      <span>{{ article.published_at.strftime('%d/%m/%Y') if article.published_at else article.created_at.strftime('%d/%m/%Y') }}</span>
+      <a href="/article/{{ article.id }}">Leggi guida →</a>
+    </div>
+  </div>
+  {% else %}
+  <p style="color: var(--text-muted);">Guide in arrivo! Torna presto per tutorial completi.</p>
+  {% endfor %}
+</div>
+
+{% endblock %}

@@ -407,3 +407,113 @@ def delete_comment_route(
     success = crud.delete_comment(db, comment_id, current_user.id)
     # Redirect back to referer or home
     return RedirectResponse(url="/", status_code=302)
+
+
+# ===== LLM ON PREMISE SECTION =====
+
+@app.get("/llm-onpremise", response_class=HTMLResponse)
+def llmonpremise_home(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(auth.get_current_user_optional)
+):
+    """LLMOnPremise homepage: hardware-focused articles."""
+    # Filter articles by hardware/infrastructure categories
+    hardware_categories = ["Hardware", "Infrastructure", "GPU", "Server"]
+    articles = crud.get_articles_by_categories(db, hardware_categories, limit=12)
+    
+    return templates.TemplateResponse(
+        "onpremise_index.html",
+        {
+            "request": request,
+            "articles": articles,
+            "page_title": "LLM OnPremise - Hardware & Infrastructure",
+            "current_user": current_user,
+        },
+    )
+
+
+@app.get("/llm-onpremise/hardware", response_class=HTMLResponse)
+def llmonpremise_hardware(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(auth.get_current_user_optional)
+):
+    """Hardware section: GPUs, servers, benchmarks."""
+    articles = crud.get_articles_by_categories(db, ["Hardware", "GPU"], limit=20)
+    
+    return templates.TemplateResponse(
+        "onpremise_hardware.html",
+        {
+            "request": request,
+            "articles": articles,
+            "page_title": "Hardware - LLM OnPremise",
+            "current_user": current_user,
+        },
+    )
+
+
+@app.get("/llm-onpremise/infrastructure", response_class=HTMLResponse)
+def llmonpremise_infrastructure(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(auth.get_current_user_optional)
+):
+    """Infrastructure section: Kubernetes, Docker, deployment."""
+    articles = crud.get_articles_by_categories(db, ["Infrastructure", "Server"], limit=20)
+    
+    return templates.TemplateResponse(
+        "onpremise_infrastructure.html",
+        {
+            "request": request,
+            "articles": articles,
+            "page_title": "Infrastructure - LLM OnPremise",
+            "current_user": current_user,
+        },
+    )
+
+
+@app.get("/llm-onpremise/guides", response_class=HTMLResponse)
+def llmonpremise_guides(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(auth.get_current_user_optional)
+):
+    """Setup guides and tutorials."""
+    # Filter for tutorial/guide articles
+    articles = crud.get_articles_with_keyword(db, "guide", limit=20)
+    
+    return templates.TemplateResponse(
+        "onpremise_guides.html",
+        {
+            "request": request,
+            "articles": articles,
+            "page_title": "Setup Guides - LLM OnPremise",
+            "current_user": current_user,
+        },
+    )
+
+
+@app.get("/llm-onpremise/search", response_class=HTMLResponse)
+def llmonpremise_search(
+    request: Request,
+    q: Optional[str] = None,
+    db: Session = Depends(get_db),
+):
+    """Search within LLMOnPremise section."""
+    query = (q or "").strip()
+    articles = []
+    if query:
+        # Search only in hardware-related categories
+        hardware_categories = ["Hardware", "Infrastructure", "GPU", "Server"]
+        articles = crud.search_articles_in_categories(db, query, hardware_categories, limit=50)
+
+    return templates.TemplateResponse(
+        "onpremise_search.html",
+        {
+            "request": request,
+            "articles": articles,
+            "query": query,
+            "page_title": f"Search: {query}" if query else "Search Hardware",
+        },
+    )

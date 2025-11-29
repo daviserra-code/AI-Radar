@@ -177,3 +177,82 @@ def delete_comment(db: Session, comment_id: int, user_id: int) -> bool:
         db.commit()
         return True
     return False
+
+
+# ===== LLM ON PREMISE HELPERS =====
+
+def get_articles_by_categories(
+    db: Session, 
+    category_names: List[str], 
+    limit: int = 20
+) -> List[models.Article]:
+    """Get articles filtered by category names."""
+    categories = db.query(models.Category).filter(
+        models.Category.name.in_(category_names)
+    ).all()
+    category_ids = [c.id for c in categories]
+    
+    if not category_ids:
+        return []
+    
+    return (
+        db.query(models.Article)
+        .filter(models.Article.category_id.in_(category_ids))
+        .order_by(models.Article.created_at.desc())
+        .limit(limit)
+        .all()
+    )
+
+
+def get_articles_with_keyword(
+    db: Session,
+    keyword: str,
+    limit: int = 20
+) -> List[models.Article]:
+    """Get articles containing a specific keyword."""
+    q = f"%{keyword}%"
+    return (
+        db.query(models.Article)
+        .filter(
+            or_(
+                models.Article.title.ilike(q),
+                models.Article.summary.ilike(q),
+                models.Article.content.ilike(q),
+            )
+        )
+        .order_by(models.Article.created_at.desc())
+        .limit(limit)
+        .all()
+    )
+
+
+def search_articles_in_categories(
+    db: Session,
+    query: str,
+    category_names: List[str],
+    limit: int = 50
+) -> List[models.Article]:
+    """Search articles within specific categories."""
+    categories = db.query(models.Category).filter(
+        models.Category.name.in_(category_names)
+    ).all()
+    category_ids = [c.id for c in categories]
+    
+    if not category_ids:
+        return []
+    
+    q = f"%{query}%"
+    return (
+        db.query(models.Article)
+        .filter(
+            models.Article.category_id.in_(category_ids),
+            or_(
+                models.Article.title.ilike(q),
+                models.Article.summary.ilike(q),
+                models.Article.content.ilike(q),
+            )
+        )
+        .order_by(models.Article.created_at.desc())
+        .limit(limit)
+        .all()
+    )

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="it" class="llm-onpremise-section">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ page_title or "LLM OnPremise - Hardware & Infrastructure" }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="stylesheet" href="/static/onpremise.css" />
+</head>
+<body>
+  <header class="onprem-header">
+    <div class="container">
+      <div class="nav-flex">
+        <!-- LOGO ONPREMISE (Concept 2: The Core) -->
+        <div class="onprem-logo-block">
+          <svg width="240" height="60" viewBox="0 0 240 60" xmlns="http://www.w3.org/2000/svg">
+            <g transform="translate(30, 30)">
+              <!-- Hexagon Server Rack -->
+              <path d="M0,-15 L15,-7 L15,10 L0,18 L-15,10 L-15,-7 Z" 
+                    fill="none" 
+                    stroke="#39FF14" 
+                    stroke-width="2" 
+                    stroke-linejoin="round"/>
+              <path d="M-15,-7 L0,0 L15,-7" 
+                    fill="none" 
+                    stroke="#39FF14" 
+                    stroke-width="1" 
+                    opacity="0.5"/>
+              <path d="M0,0 L0,18" 
+                    fill="none" 
+                    stroke="#39FF14" 
+                    stroke-width="1" 
+                    opacity="0.5"/>
+              <!-- Core CPU -->
+              <rect x="-4" y="-2" width="8" height="8" fill="#39FF14" rx="1">
+                <animate attributeName="fill-opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"/>
+              </rect>
+            </g>
+            <text x="60" y="36" 
+                  fill="#39FF14" 
+                  font-family="'Courier New', monospace" 
+                  font-weight="bold" 
+                  font-size="22">LLM</text>
+            <text x="105" y="36" 
+                  fill="white" 
+                  font-family="'Courier New', monospace" 
+                  font-size="20">OnPremise</text>
+          </svg>
+
+          <div class="onprem-logo-text">
+            <div class="onprem-logo-main">
+              <span class="accent-llm">LLM</span>OnPremise
+            </div>
+            <div class="onprem-logo-sub">
+              Hardware · Stack · Infrastruttura Locale
+            </div>
+          </div>
+        </div>
+
+        <!-- NAVIGATION -->
+        <nav class="nav-links">
+          <a href="/llm-onpremise">Home</a>
+          <a href="/llm-onpremise/hardware">Hardware</a>
+          <a href="/llm-onpremise/infrastructure">Infrastructure</a>
+          <a href="/llm-onpremise/guides">Setup Guides</a>
+          <a href="/" style="color: var(--neon-cyan);">← AI-Radar News</a>
+          {% if current_user %}
+            {% if current_user.is_admin %}
+              <a href="/admin/new" class="nav-cta">+ Post</a>
+            {% endif %}
+            <a href="/logout" style="color: var(--text-muted);">Logout (@{{ current_user.username }})</a>
+          {% else %}
+            <a href="/login">Login</a>
+          {% endif %}
+        </nav>
+
+        <!-- SEARCH -->
+        <form class="search-form" method="get" action="/llm-onpremise/search">
+          <input
+            class="search-input"
+            type="text"
+            name="q"
+            placeholder="Search hardware, GPUs, servers..."
+            value="{{ request.query_params.get('q') or '' }}"
+          />
+          <button class="search-btn" type="submit">Search</button>
+        </form>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          LLMOnPremise.com · Hardware, Stack e Soluzioni On-Premise per LLM Locali
+        </div>
+        <div>
+          <a href="/" style="color: var(--neon-cyan);">AI-RADAR.it</a> · 
+          <a href="/llm-onpremise" style="color: var(--onprem-green);">LLMOnPremise.com</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

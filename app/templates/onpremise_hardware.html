@@ -1,0 +1,46 @@
+{% extends "onpremise_base.html" %}
+
+{% block content %}
+
+<div class="section-header">
+  <h1>⚡ Hardware per LLM On-Premise</h1>
+  <p>GPU, Server, Workstation e benchmark per deployare LLM locali</p>
+</div>
+
+<div class="onpremise-nav-pills">
+  <a href="/llm-onpremise">🏠 Overview</a>
+  <a href="/llm-onpremise/hardware" class="active">⚡ Hardware</a>
+  <a href="/llm-onpremise/infrastructure">🔧 Infrastructure</a>
+  <a href="/llm-onpremise/guides">📖 Setup Guides</a>
+</div>
+
+<div class="infra-grid">
+  {% for article in articles %}
+  <div class="hardware-card">
+    <span class="hardware-tag">{{ article.category.name }}</span>
+    {% if article.image_url %}
+    <img src="{{ article.image_url }}" alt="{{ article.title }}" style="width: 100%; height: 180px; object-fit: cover; border-radius: 6px; margin-bottom: 1rem;">
+    {% endif %}
+    
+    <h3><a href="/article/{{ article.id }}">{{ article.title }}</a></h3>
+    <p>{{ article.summary[:200] }}...</p>
+    
+    <div class="card-meta">
+      <span>{{ article.published_at.strftime('%d/%m/%Y') if article.published_at else article.created_at.strftime('%d/%m/%Y') }}</span>
+      <a href="/article/{{ article.id }}">Leggi →</a>
+    </div>
+  </div>
+  {% else %}
+  <p style="color: var(--text-muted);">Nessun articolo hardware disponibile al momento.</p>
+  {% endfor %}
+</div>
+
+<div class="cross-link-banner" style="margin-top: 3rem;">
+  <div>
+    <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">🔍 Cerca più articoli su AI-RADAR</div>
+    <p style="color: var(--text-muted); font-size: 0.9rem;">Esplora news e analisi complete sul mondo AI</p>
+  </div>
+  <a href="/" class="btn-tech">AI-RADAR.it →</a>
+</div>
+
+{% endblock %}

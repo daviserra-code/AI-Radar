@@ -1,0 +1,109 @@
+{% extends "onpremise_base.html" %}
+
+{% block content %}
+
+<!-- HERO SECTION -->
+<div class="onprem-hero">
+  <div class="onprem-hero-content">
+    <h1>
+      <span class="highlight">Hardware & Stack</span> per LLM Locali
+    </h1>
+    <p>
+      Soluzioni on-premise, configurazioni server, GPU workstation e infrastructure 
+      per deployare e gestire Large Language Models in locale. Dalla scelta della GPU 
+      alla configurazione di Kubernetes, tutto quello che serve per il tuo stack LLM.
+    </p>
+  </div>
+</div>
+
+<!-- NAVIGATION PILLS -->
+<div class="onprem-nav-pills">
+  <a href="/llm-onpremise" class="active">🏠 Overview</a>
+  <a href="/llm-onpremise/hardware">⚡ Hardware</a>
+  <a href="/llm-onpremise/infrastructure">🔧 Infrastructure</a>
+  <a href="/llm-onpremise/guides">📖 Setup Guides</a>
+</div>
+
+<!-- SPECS OVERVIEW -->
+<div class="section-header">
+  <h2>📊 Hardware Benchmark Overview</h2>
+  <p>Configurazioni testate per modelli da 7B a 70B parametri</p>
+</div>
+
+<div class="spec-grid">
+  <div class="spec-item">
+    <div class="spec-label">GPU Tier 1</div>
+    <div class="spec-value">RTX 4090<span class="spec-unit"></span></div>
+    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">
+      24GB VRAM · ~70B Q4
+    </div>
+  </div>
+  
+  <div class="spec-item">
+    <div class="spec-label">GPU Tier 2</div>
+    <div class="spec-value">RTX 4070<span class="spec-unit"></span></div>
+    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">
+      12GB VRAM · ~13B Q4
+    </div>
+  </div>
+  
+  <div class="spec-item">
+    <div class="spec-label">RAM Minimum</div>
+    <div class="spec-value">32<span class="spec-unit">GB</span></div>
+    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">
+      Per modelli 7B-13B
+    </div>
+  </div>
+  
+  <div class="spec-item">
+    <div class="spec-label">Storage SSD</div>
+    <div class="spec-value">500<span class="spec-unit">GB</span></div>
+    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">
+      Models + Vector DB
+    </div>
+  </div>
+</div>
+
+<!-- LATEST HARDWARE ARTICLES -->
+<div class="section-header" style="margin-top: 3rem;">
+  <h2>🔥 Ultimi Articoli Hardware</h2>
+  <p>News e guide su GPU, server e configurazioni on-premise</p>
+</div>
+
+<div class="infra-grid">
+  {% for article in articles %}
+  <div class="hardware-card">
+    <span class="hardware-tag">{{ article.category.name }}</span>
+    {% if article.image_url %}
+    <span class="hardware-tag tag-gpu">GPU</span>
+    {% endif %}
+    
+    <h3><a href="/article/{{ article.id }}">{{ article.title }}</a></h3>
+    <p>{{ article.summary[:150] }}...</p>
+    
+    <div class="card-meta">
+      <span>{{ article.published_at.strftime('%d/%m/%Y') }}</span>
+      <a href="/article/{{ article.id }}">Leggi →</a>
+    </div>
+  </div>
+  {% else %}
+  <p style="color: var(--text-muted);">
+    Nessun articolo disponibile. Torna presto per news su hardware e infrastructure!
+  </p>
+  {% endfor %}
+</div>
+
+<!-- CROSS LINK TO AI-RADAR -->
+<div class="cross-link-banner">
+  <div>
+    <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">
+      📡 Cerchi news generali su AI e LLM?
+    </div>
+    <p style="color: var(--text-muted); font-size: 0.9rem;">
+      Vai su AI-RADAR per notizie, analisi e aggiornamenti dal mondo dell'intelligenza artificiale
+    </p>
+  </div>
+  <a href="/" class="btn-tech">AI-RADAR.it →</a>
+</div>
+
+{% endblock %}

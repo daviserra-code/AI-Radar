@@ -1,0 +1,61 @@
+{% extends "onpremise_base.html" %}
+
+{% block content %}
+
+<div class="section-header">
+  <h1>🔧 Infrastructure & Deployment</h1>
+  <p>Kubernetes, Docker, orchestrazione e deployment di LLM in produzione</p>
+</div>
+
+<div class="onpremise-nav-pills">
+  <a href="/llm-onpremise">🏠 Overview</a>
+  <a href="/llm-onpremise/hardware">⚡ Hardware</a>
+  <a href="/llm-onpremise/infrastructure" class="active">🔧 Infrastructure</a>
+  <a href="/llm-onpremise/guides">📖 Setup Guides</a>
+</div>
+
+<div class="spec-grid" style="margin-bottom: 3rem;">
+  <div class="spec-item">
+    <div class="spec-label">Container</div>
+    <div class="spec-value" style="font-size: 1.4rem;">Docker</div>
+    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">Standard deployment</div>
+  </div>
+  
+  <div class="spec-item">
+    <div class="spec-label">Orchestration</div>
+    <div class="spec-value" style="font-size: 1.4rem;">K8s</div>
+    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">Production scale</div>
+  </div>
+  
+  <div class="spec-item">
+    <div class="spec-label">Load Balancing</div>
+    <div class="spec-value" style="font-size: 1.4rem;">Nginx</div>
+    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">Reverse proxy</div>
+  </div>
+  
+  <div class="spec-item">
+    <div class="spec-label">Monitoring</div>
+    <div class="spec-value" style="font-size: 1.4rem;">Grafana</div>
+    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">Metrics & logs</div>
+  </div>
+</div>
+
+<div class="infra-grid">
+  {% for article in articles %}
+  <div class="hardware-card">
+    <span class="hardware-tag">{{ article.category.name }}</span>
+    
+    <h3><a href="/article/{{ article.id }}">{{ article.title }}</a></h3>
+    <p>{{ article.summary[:200] }}...</p>
+    
+    <div class="card-meta">
+      <span>{{ article.published_at.strftime('%d/%m/%Y') if article.published_at else article.created_at.strftime('%d/%m/%Y') }}</span>
+      <a href="/article/{{ article.id }}">Leggi →</a>
+    </div>
+  </div>
+  {% else %}
+  <p style="color: var(--text-muted);">Nessun articolo infrastructure disponibile al momento.</p>
+  {% endfor %}
+</div>
+
+{% endblock %}
