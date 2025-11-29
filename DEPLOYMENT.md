@@ -19,10 +19,10 @@ SSH into your Hetzner server and run the deployment script:
 
 ```bash
 # SSH into server
-ssh root@your-server-ip
+ssh root@46.224.91.14
 
 # Navigate to project
-cd /path/to/AI-Radar
+cd /opt/AI-Radar
 
 # Run deployment script
 chmod +x deploy.sh
@@ -44,19 +44,19 @@ The script will:
 git add -A; git commit -m "Update feature"; git push
 
 # Deploy to server via SSH
-ssh root@your-server-ip "cd /path/to/AI-Radar && ./deploy.sh"
+ssh root@46.224.91.14 "cd /opt/AI-Radar && ./deploy.sh"
 ```
 
 **One-liner deploy from local:**
 ```powershell
-git add -A; git commit -m "Deploy update"; git push; ssh root@your-server-ip "cd /path/to/AI-Radar && ./deploy.sh"
+git add -A; git commit -m "Deploy update"; git push; ssh root@46.224.91.14 "cd /opt/AI-Radar && ./deploy.sh"
 ```
 
 ### 4. Manual Deployment Steps (if script fails)
 
 ```bash
 # On Hetzner server
-cd /path/to/AI-Radar
+cd /opt/AI-Radar
 git pull origin main
 docker-compose down
 docker-compose up -d --build

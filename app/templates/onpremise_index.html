@@ -82,7 +82,7 @@
     <p>{{ article.summary[:150] }}...</p>
     
     <div class="card-meta">
-      <span>{{ article.published_at.strftime('%d/%m/%Y') }}</span>
+      <span>{{ article.created_at.strftime('%d/%m/%Y') }}</span>
       <a href="/article/{{ article.id }}">Leggi →</a>
     </div>
   </div>
