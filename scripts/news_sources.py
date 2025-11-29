@@ -10,28 +10,40 @@ import feedparser
 
 
 AI_FEEDS = [
-    # Major AI Labs
+    # Major AI Labs & Research
     "https://openai.com/blog/rss.xml",
     "https://huggingface.co/blog/feed.xml",
     "https://ai.googleblog.com/feeds/posts/default",
     "https://www.anthropic.com/news/rss.xml",
+    "https://www.deepmind.com/blog/rss.xml",
+    "https://blog.research.google/feeds/posts/default",
     
-    # LLM & ML News
+    # LLM & ML Tools/Frameworks
     "https://blog.langchain.dev/rss.xml",
     "https://ollama.com/blog/rss.xml",
     "https://alphasignal.ai/rss.xml",
-    
-    # Tech News (AI focused)
-    "https://techcrunch.com/tag/artificial-intelligence/feed/",
-    "https://www.theverge.com/ai-artificial-intelligence/rss/index.xml",
-    "https://arstechnica.com/tag/artificial-intelligence/feed/",
-    
-    # Developer/Framework News
     "https://pytorch.org/blog/feed.xml",
     "https://blog.tensorflow.org/feeds/posts/default",
     
-    # Hardware & Local AI
-    "https://www.tomshardware.com/feeds/all",
+    # AI News & Analysis (English)
+    "https://techcrunch.com/tag/artificial-intelligence/feed/",
+    "https://www.theverge.com/ai-artificial-intelligence/rss/index.xml",
+    "https://arstechnica.com/tag/artificial-intelligence/feed/",
+    "https://venturebeat.com/category/ai/feed/",
+    "https://www.technologyreview.com/topic/artificial-intelligence/feed",
+    
+    # Italian Tech & AI News
+    "https://www.hwupgrade.it/rss/news.xml",
+    "https://www.tomshw.it/feed/",
+    "https://www.dday.it/rss",
+    "https://www.punto-informatico.it/feed/",
+    
+    # Developer & OSS AI
+    "https://github.blog/category/ai-and-ml/feed/",
+    "https://news.ycombinator.com/rss",
+    
+    # Hardware (AI/ML focused, limited)
+    "https://www.tomshardware.com/tag/artificial-intelligence/feed/",
     "https://www.anandtech.com/rss/",
 ]
 

@@ -35,7 +35,8 @@ def article_exists_by_source(db: Session, source_url: str) -> bool:
 def ingest_from_feeds():
     db: Session = SessionLocal()
     try:
-        raw_items = fetch_raw_news(limit_per_feed=3)
+        # Increased from 3 to 5 articles per feed for better variety
+        raw_items = fetch_raw_news(limit_per_feed=5)
         print(f"Trovate {len(raw_items)} news grezze dai feed.")
 
         for item in raw_items:
