@@ -52,6 +52,7 @@ log.txt
 *.sqlite
 *.sqlite3
 chroma_db/
+chroma_store/
 
 # Docker
 .dockerignore
