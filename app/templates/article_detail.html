@@ -6,9 +6,9 @@
     <div class="badge-row">
       <span class="pill pill-category">
         {% if article.category %}
-          {{ article.category.name }}
+          {{ article.category.icon or '📁' }} {{ article.category.name }}
         {% else %}
-          Generale
+          📁 Generale
         {% endif %}
       </span>
       {% if article.ai_generated %}
@@ -36,12 +36,27 @@
       </span>
       {% endif %}
     </div>
+    
+    {% if article.tags %}
+    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
+      {% for tag in article.tags %}
+        <a href="/tag/{{ tag.slug }}" 
+           style="display: inline-block; padding: 0.4rem 0.8rem; background: var(--bg-card); 
+                  color: var(--neon-cyan); border: 1px solid var(--neon-cyan); border-radius: 15px; 
+                  text-decoration: none; font-size: 0.85em; font-weight: 600; transition: all 0.2s;"
+           onmouseover="this.style.background='rgba(0,255,255,0.2)';"
+           onmouseout="this.style.background='var(--bg-card)';">
+          🏷️ {{ tag.name }}
+        </a>
+      {% endfor %}
+    </div>
+    {% endif %}
   </header>
 
   {% if article.image_url %}
   <div style="margin: 2rem 0; text-align: center;">
-    <img src="{{ article.image_url }}" alt="{{ article.title }}" 
-         style="max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border-dim);">
+    <img src="{{ article.image_url }}" alt="{{ article.title }}" loading="lazy"
+         style="max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border-dim); image-rendering: -webkit-optimize-contrast; image-rendering: smooth;">
   </div>
   {% endif %}
 
@@ -157,6 +172,28 @@ function toggleLanguage() {
   }
 }
 </script>
+{% endif %}
+
+<!-- RELATED ARTICLES -->
+{% if related_articles %}
+<div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-dim);">
+  <h2 style="font-size: 1.3rem; margin-bottom: 1.5rem; color: var(--neon-cyan);">
+    📚 Articoli Correlati
+  </h2>
+  <div class="news-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+    {% for related in related_articles %}
+    <div class="card">
+      <span class="card-tag">{{ related.category.name }}</span>
+      <h3><a href="/article/{{ related.slug }}">{{ related.title }}</a></h3>
+      <p>{{ related.summary[:120] }}...</p>
+      <div class="card-meta">
+        <span>{{ related.created_at.strftime('%d/%m/%Y') }}</span>
+        <a href="/article/{{ related.slug }}">Leggi →</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
 {% endif %}
 
 {% endblock %}

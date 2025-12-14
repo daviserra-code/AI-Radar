@@ -2,8 +2,12 @@
 {% block content %}
 
 <section class="section-header">
-  <h1>Categoria: {{ category.name }}</h1>
-  <p>Articoli filtrati per questa area dell’ecosistema AI / LLM.</p>
+  <h1>{{ category.icon or '📁' }} {{ category.name }}</h1>
+  {% if category.description %}
+    <p>{{ category.description }}</p>
+  {% else %}
+    <p>Articoli filtrati per questa area dell'ecosistema AI / LLM.</p>
+  {% endif %}
 </section>
 
 <div class="article-grid">
@@ -13,9 +17,9 @@
       <div class="badge-row">
         <span class="pill pill-category">
           {% if article.category %}
-            {{ article.category.name }}
+            {{ article.category.icon or '📁' }} {{ article.category.name }}
           {% else %}
-            Generale
+            📁 Generale
           {% endif %}
         </span>
         {% if article.ai_generated %}

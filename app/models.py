@@ -1,9 +1,18 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey, Table
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import bcrypt
 
 from .database import Base
+
+
+# Association table for many-to-many relationship between articles and tags
+article_tags = Table(
+    'article_tags',
+    Base.metadata,
+    Column('article_id', Integer, ForeignKey('articles.id'), primary_key=True),
+    Column('tag_id', Integer, ForeignKey('tags.id'), primary_key=True)
+)
 
 
 class Category(Base):
@@ -12,6 +21,8 @@ class Category(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), unique=True, index=True, nullable=False)
     slug = Column(String(100), unique=True, index=True, nullable=False)
+    icon = Column(String(10), nullable=True, default="📁")
+    description = Column(String(255), nullable=True)
 
     articles = relationship("Article", back_populates="category")
 
@@ -42,6 +53,7 @@ class Article(Base):
     category = relationship("Category", back_populates="articles")
     
     comments = relationship("Comment", back_populates="article", cascade="all, delete-orphan")
+    tags = relationship("Tag", secondary=article_tags, back_populates="articles")
 
 
 class User(Base):
@@ -83,3 +95,24 @@ class Comment(Base):
     
     user = relationship("User", back_populates="comments")
     article = relationship("Article", back_populates="comments")
+
+
+class Newsletter(Base):
+    __tablename__ = "newsletter_subscribers"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String(255), unique=True, index=True, nullable=False)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    unsubscribe_token = Column(String(64), unique=True, nullable=True)
+
+
+class Tag(Base):
+    __tablename__ = "tags"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(50), unique=True, index=True, nullable=False)
+    slug = Column(String(50), unique=True, index=True, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    articles = relationship("Article", secondary=article_tags, back_populates="tags")

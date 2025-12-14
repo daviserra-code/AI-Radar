@@ -164,3 +164,46 @@ Rispondi con testo normale, senza JSON.
         raise
 
     return answer.strip()
+
+
+def get_related_articles(
+    db: Session, article_id: int, top_k: int = 4
+) -> List[models.Article]:
+    """
+    Find articles similar to the given article using vector similarity.
+    Excludes the current article from results.
+    """
+    article = db.query(models.Article).filter(models.Article.id == article_id).first()
+    if not article:
+        return []
+    
+    try:
+        count = _collection.count()
+    except Exception:
+        count = 0
+    
+    if count == 0:
+        return []
+    
+    # Use article title + content as query
+    query_text = f"{article.title}\n\n{article.content}"
+    query_emb = _embed([query_text])[0]
+    
+    # Get top_k + 1 to account for the article itself
+    result = _collection.query(query_embeddings=[query_emb], n_results=top_k + 1)
+    
+    id_lists = result.get("ids") or []
+    if not id_lists or not id_lists[0]:
+        return []
+    
+    id_strs = id_lists[0]
+    try:
+        ids = [int(x) for x in id_strs if int(x) != article_id][:top_k]
+    except ValueError:
+        logger.warning("IDs non parsabili in int: %s", id_strs)
+        return []
+    
+    articles = db.query(models.Article).filter(models.Article.id.in_(ids)).all()
+    by_id = {a.id: a for a in articles}
+    ordered = [by_id[i] for i in ids if i in by_id]
+    return ordered

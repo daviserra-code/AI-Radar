@@ -81,20 +81,102 @@ df -h
 # Monitor resources
 docker stats
 
+# Health check
+curl http://localhost:8000/health | jq
+
+# Detailed metrics
+curl http://localhost:8000/api/metrics | jq
+
 # Database backup
-docker exec llmobs_db pg_dump -U llmobs_user -d llmobs_db > backup_$(date +%Y%m%d).sql
+docker exec llmobs_db pg_dump -U llmobs_user -d llmobs_db | gzip > backup_$(date +%Y%m%d).sql.gz
 ```
 
-### 6. Environment Configuration
+### 5.1. Database Backup & Restore
 
-Ensure your server has a `.env` file or environment variables set in `docker-compose.yml`:
+**Automated backup script** (`/opt/scripts/backup-ai-radar.sh`):
+```bash
+#!/bin/bash
+BACKUP_DIR="/opt/backups/ai-radar"
+DATE=$(date +%Y%m%d_%H%M%S)
+mkdir -p $BACKUP_DIR
 
-```yaml
-environment:
-  DATABASE_URL: postgresql+psycopg2://llmobs_user:llmobs_pass@db:5432/llmobs_db
-  OLLAMA_HOST: http://ollama:11434
-  OLLAMA_MODEL: llama3.2:latest
-  INGEST_INTERVAL_MINUTES: "5"
+# Backup database
+docker exec llmobs_db pg_dump -U llmobs_user llmobs_db | gzip > $BACKUP_DIR/db_$DATE.sql.gz
+
+# Keep only last 7 days
+find $BACKUP_DIR -name "*.sql.gz" -mtime +7 -delete
+echo "Backup completed: db_$DATE.sql.gz"
+```
+
+**Setup automated backups:**
+```bash
+chmod +x /opt/scripts/backup-ai-radar.sh
+crontab -e
+# Add: 0 2 * * * /opt/scripts/backup-ai-radar.sh >> /var/log/ai-radar-backup.log 2>&1
+```
+
+**Restore from backup:**
+```bash
+docker-compose stop app
+gunzip -c /opt/backups/ai-radar/db_YYYYMMDD_HHMMSS.sql.gz | \
+  docker exec -i llmobs_db psql -U llmobs_user -d llmobs_db
+docker-compose start app
+```
+
+### 6. Production Environment Configuration
+
+**Create `.env` file on server** (CRITICAL for production):
+
+```bash
+# On Hetzner server
+cd /opt/AI-Radar
+cp .env.example .env
+nano .env
+```
+
+**Required Production Settings:**
+
+```env
+# Database - Use strong password!
+POSTGRES_USER=llmobs_user
+POSTGRES_PASSWORD=CHANGE_THIS_TO_STRONG_PASSWORD
+POSTGRES_DB=llmobs_db
+DATABASE_URL=postgresql+psycopg2://llmobs_user:STRONG_PASSWORD@db:5432/llmobs_db
+
+# Security - GENERATE THESE!
+# Generate with: python -c "import secrets; print(secrets.token_urlsafe(32))"
+JWT_SECRET_KEY=YOUR_GENERATED_SECRET_HERE
+JWT_ALGORITHM=HS256
+JWT_ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+# Application
+ENVIRONMENT=production
+DOMAIN=46.224.91.14
+ALLOWED_ORIGINS=http://46.224.91.14:8000,https://46.224.91.14:8000
+FORCE_HTTPS=false  # Set to true after SSL setup
+
+# Ollama
+OLLAMA_HOST=http://ollama:11434
+OLLAMA_MODEL=llama3.2:latest
+
+# Logging
+LOG_LEVEL=INFO
+LOG_FILE=logs/app.log
+
+# Rate Limiting (adjust for production traffic)
+RATE_LIMIT_ENABLED=true
+RATE_LIMIT_PER_MINUTE=100
+RATE_LIMIT_PER_HOUR=5000
+
+# Scheduler
+FETCH_INTERVAL_MINUTES=5
+ARTICLES_PER_FEED=5
+```
+
+**Generate secure secrets:**
+```bash
+python3 -c "import secrets; print('JWT_SECRET_KEY=' + secrets.token_urlsafe(32))"
+python3 -c "import secrets; print('POSTGRES_PASSWORD=' + secrets.token_urlsafe(24))"
 ```
 
 ### 7. Nginx Reverse Proxy (Optional)

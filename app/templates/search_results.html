@@ -3,9 +3,9 @@
 
 <section class="section-header">
   {% if query %}
-    <h2>Risultati per: “{{ query }}”</h2>
-    <p>
-      Articoli che contengono il termine cercato nel titolo, nel riassunto o nel contenuto.
+    <h2>Risultati per: "<mark style="background: var(--neon-cyan); color: #000; padding: 2px 6px; border-radius: 3px;">{{ query }}</mark>"</h2>
+    <p style="font-size: 1.1em; color: var(--text-secondary);">
+      Trovati <strong style="color: var(--neon-cyan);">{{ result_count }}</strong> articoli
     </p>
   {% else %}
     <h2>Ricerca</h2>
@@ -14,6 +14,46 @@
 </section>
 
 {% if query %}
+  <!-- Search Filters -->
+  <div style="background: var(--bg-card); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border: 1px solid var(--border-dim);">
+    <form method="get" action="/search" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
+      <input type="hidden" name="q" value="{{ query }}">
+      
+      <div>
+        <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.9em;">Categoria</label>
+        <select name="category" style="width: 100%; padding: 0.6rem; background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border-dim); border-radius: 4px;">
+          <option value="">Tutte le categorie</option>
+          {% for cat in categories %}
+            <option value="{{ cat.slug }}" {% if selected_category == cat.slug %}selected{% endif %}>
+              {{ cat.icon or '📁' }} {{ cat.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div>
+        <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.9em;">Data inizio</label>
+        <input type="date" name="from_date" value="{{ from_date or '' }}" 
+               style="width: 100%; padding: 0.6rem; background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border-dim); border-radius: 4px;">
+      </div>
+      
+      <div>
+        <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.9em;">Data fine</label>
+        <input type="date" name="to_date" value="{{ to_date or '' }}" 
+               style="width: 100%; padding: 0.6rem; background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border-dim); border-radius: 4px;">
+      </div>
+      
+      <div style="display: flex; gap: 0.5rem;">
+        <button type="submit" style="flex: 1; padding: 0.6rem 1rem; background: var(--neon-cyan); color: #000; border: none; border-radius: 4px; font-weight: 600; cursor: pointer;">
+          🔍 Filtra
+        </button>
+        <a href="/search?q={{ query }}" style="flex: 1; padding: 0.6rem 1rem; background: transparent; color: var(--text-secondary); border: 1px solid var(--border-dim); border-radius: 4px; text-align: center; text-decoration: none; font-weight: 600;">
+          ✕ Reset
+        </a>
+      </div>
+    </form>
+  </div>
+
   {% if articles %}
   <section class="news-grid">
     {% for article in articles %}
@@ -22,9 +62,9 @@
         <div>
           <span class="card-tag">
             {% if article.category %}
-              {{ article.category.name }}
+              {{ article.category.icon or '📁' }} {{ article.category.name }}
             {% else %}
-              Generale
+              📁 Generale
             {% endif %}
           </span>
           {% if article.ai_generated %}
@@ -57,7 +97,10 @@
     {% endfor %}
   </section>
   {% else %}
-    <p>Nessun articolo trovato per questa ricerca.</p>
+    <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+      <p style="font-size: 1.2em;">❌ Nessun articolo trovato per questa ricerca.</p>
+      <p>Prova a modificare i filtri o usa termini di ricerca diversi.</p>
+    </div>
   {% endif %}
 {% endif %}
 

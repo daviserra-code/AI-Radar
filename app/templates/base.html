@@ -61,6 +61,7 @@
           <a href="/category/llm">LLM</a>
           <a href="/category/frameworks">Frameworks</a>
           <a href="/category/hardware">Hardware</a>
+          <a href="/tags">🏷️ Tags</a>
           <a href="/llm-onpremise" style="color: var(--neon-green); border: 1px solid var(--neon-green); padding: 0.4rem 0.7rem; border-radius: 999px;">💻 LLMOnPremise</a>
           <a href="/ask" class="nav-pill-disabled">Ask Observatory</a>
           {% if current_user %}
@@ -97,8 +98,95 @@
 
   <footer>
     <div class="container">
-      AI-RADAR.it · LLM on-premise, stack locali e analisi editoriali.
+      <!-- Newsletter Signup -->
+      <div style="background: var(--bg-card); padding: 2rem; border-radius: 8px; margin-bottom: 2rem; border: 1px solid var(--neon-cyan);">
+        <div style="max-width: 600px; margin: 0 auto; text-align: center;">
+          <h3 style="color: var(--neon-cyan); margin-bottom: 0.5rem;">📬 Newsletter AI-RADAR</h3>
+          <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+            Ricevi aggiornamenti settimanali su AI, LLM e hardware on-premise
+          </p>
+          <form id="newsletterForm" style="display: flex; gap: 0.5rem; justify-content: center;">
+            <input 
+              type="email" 
+              id="newsletterEmail" 
+              placeholder="Il tuo indirizzo email" 
+              required
+              style="flex: 1; max-width: 400px; padding: 0.8rem; background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border-dim); border-radius: 4px;"
+            >
+            <button 
+              type="submit"
+              style="padding: 0.8rem 1.5rem; background: var(--neon-cyan); color: #000; border: none; border-radius: 4px; font-weight: 600; cursor: pointer;"
+            >
+              Iscriviti
+            </button>
+          </form>
+          <div id="newsletterMessage" style="margin-top: 1rem; font-size: 0.9em;"></div>
+        </div>
+      </div>
+      
+      <!-- Footer Info -->
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          AI-RADAR.it · LLM on-premise, stack locali e analisi editoriali.
+        </div>
+        <div style="display: flex; gap: 1.5rem; font-size: 0.85em; color: var(--text-secondary);">
+          <span id="lastUpdate">⏱️ Caricamento...</span>
+          <a href="/health" style="color: var(--neon-cyan); text-decoration: none;">💚 Status</a>
+        </div>
+      </div>
     </div>
   </footer>
+  
+  <script>
+    // Newsletter subscription
+    document.getElementById('newsletterForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('newsletterEmail').value;
+      const messageDiv = document.getElementById('newsletterMessage');
+      
+      try {
+        const formData = new FormData();
+        formData.append('email', email);
+        
+        const response = await fetch('/newsletter/subscribe', {
+          method: 'POST',
+          body: formData
+        });
+        
+        const data = await response.json();
+        messageDiv.style.color = data.success ? 'var(--neon-cyan)' : '#ff6b6b';
+        messageDiv.textContent = data.message;
+        
+        if (data.success) {
+          document.getElementById('newsletterEmail').value = '';
+        }
+      } catch (error) {
+        messageDiv.style.color = '#ff6b6b';
+        messageDiv.textContent = '❌ Errore durante l\'iscrizione';
+      }
+    });
+    
+    // Fetch and display last update time
+    fetch('/health')
+      .then(res => res.json())
+      .then(data => {
+        if (data.last_update) {
+          const date = new Date(data.last_update);
+          const formatted = date.toLocaleString('it-IT', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric', 
+            hour: '2-digit', 
+            minute: '2-digit' 
+          });
+          document.getElementById('lastUpdate').textContent = `⏱️ Ultimo aggiornamento: ${formatted}`;
+        } else {
+          document.getElementById('lastUpdate').textContent = '⏱️ Aggiornamenti in corso...';
+        }
+      })
+      .catch(() => {
+        document.getElementById('lastUpdate').textContent = '⏱️ --';
+      });
+  </script>
 </body>
 </html>

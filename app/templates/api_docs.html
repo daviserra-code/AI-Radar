@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="section-header">
+  <h1>📡 API Documentation</h1>
+  <p>REST API per accedere ai contenuti di AI-RADAR</p>
+</section>
+
+<div style="max-width: 900px; margin: 0 auto;">
+  
+  <!-- Articles Endpoint -->
+  <div style="background: var(--bg-card); padding: 2rem; border-radius: 8px; margin-bottom: 2rem; border-left: 4px solid var(--neon-cyan);">
+    <h2 style="color: var(--neon-cyan); margin-bottom: 1rem;">GET /api/articles</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 1rem;">Ottieni lista di articoli con paginazione</p>
+    
+    <h3 style="font-size: 1.1em; margin: 1.5rem 0 0.5rem;">Parametri Query:</h3>
+    <ul style="color: var(--text-secondary); line-height: 1.8;">
+      <li><code style="background: var(--bg-main); padding: 0.2rem 0.5rem; border-radius: 3px;">limit</code> (int, default: 20) - Numero di articoli per pagina</li>
+      <li><code style="background: var(--bg-main); padding: 0.2rem 0.5rem; border-radius: 3px;">offset</code> (int, default: 0) - Offset per paginazione</li>
+      <li><code style="background: var(--bg-main); padding: 0.2rem 0.5rem; border-radius: 3px;">category</code> (string) - Filtra per slug categoria</li>
+    </ul>
+    
+    <h3 style="font-size: 1.1em; margin: 1.5rem 0 0.5rem;">Esempio:</h3>
+    <code style="display: block; background: var(--bg-main); padding: 1rem; border-radius: 4px; overflow-x: auto;">
+      GET /api/articles?limit=10&category=llm
+    </code>
+  </div>
+
+  <!-- Single Article Endpoint -->
+  <div style="background: var(--bg-card); padding: 2rem; border-radius: 8px; margin-bottom: 2rem; border-left: 4px solid var(--neon-cyan);">
+    <h2 style="color: var(--neon-cyan); margin-bottom: 1rem;">GET /api/article/{slug}</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 1rem;">Ottieni dettagli completi di un articolo</p>
+    
+    <h3 style="font-size: 1.1em; margin: 1.5rem 0 0.5rem;">Esempio:</h3>
+    <code style="display: block; background: var(--bg-main); padding: 1rem; border-radius: 4px; overflow-x: auto;">
+      GET /api/article/llama-3-2-release
+    </code>
+  </div>
+
+  <!-- Search Endpoint -->
+  <div style="background: var(--bg-card); padding: 2rem; border-radius: 8px; margin-bottom: 2rem; border-left: 4px solid var(--neon-cyan);">
+    <h2 style="color: var(--neon-cyan); margin-bottom: 1rem;">GET /api/search</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 1rem;">Ricerca articoli per parole chiave</p>
+    
+    <h3 style="font-size: 1.1em; margin: 1.5rem 0 0.5rem;">Parametri Query:</h3>
+    <ul style="color: var(--text-secondary); line-height: 1.8;">
+      <li><code style="background: var(--bg-main); padding: 0.2rem 0.5rem; border-radius: 3px;">q</code> (string, required) - Testo da cercare</li>
+      <li><code style="background: var(--bg-main); padding: 0.2rem 0.5rem; border-radius: 3px;">limit</code> (int, default: 20) - Numero massimo risultati</li>
+      <li><code style="background: var(--bg-main); padding: 0.2rem 0.5rem; border-radius: 3px;">category</code> (string) - Filtra per categoria</li>
+    </ul>
+    
+    <h3 style="font-size: 1.1em; margin: 1.5rem 0 0.5rem;">Esempio:</h3>
+    <code style="display: block; background: var(--bg-main); padding: 1rem; border-radius: 4px; overflow-x: auto;">
+      GET /api/search?q=gpu&category=hardware
+    </code>
+  </div>
+
+  <!-- Categories Endpoint -->
+  <div style="background: var(--bg-card); padding: 2rem; border-radius: 8px; margin-bottom: 2rem; border-left: 4px solid var(--neon-cyan);">
+    <h2 style="color: var(--neon-cyan); margin-bottom: 1rem;">GET /api/categories</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 1rem;">Lista categorie con statistiche</p>
+    
+    <h3 style="font-size: 1.1em; margin: 1.5rem 0 0.5rem;">Esempio:</h3>
+    <code style="display: block; background: var(--bg-main); padding: 1rem; border-radius: 4px; overflow-x: auto;">
+      GET /api/categories
+    </code>
+  </div>
+
+  <!-- Tags Endpoint -->
+  <div style="background: var(--bg-card); padding: 2rem; border-radius: 8px; margin-bottom: 2rem; border-left: 4px solid var(--neon-cyan);">
+    <h2 style="color: var(--neon-cyan); margin-bottom: 1rem;">GET /api/tags</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 1rem;">Lista tag popolari con conteggi</p>
+    
+    <h3 style="font-size: 1.1em; margin: 1.5rem 0 0.5rem;">Parametri Query:</h3>
+    <ul style="color: var(--text-secondary); line-height: 1.8;">
+      <li><code style="background: var(--bg-main); padding: 0.2rem 0.5rem; border-radius: 3px;">limit</code> (int, default: 50) - Numero massimo tag</li>
+    </ul>
+    
+    <h3 style="font-size: 1.1em; margin: 1.5rem 0 0.5rem;">Esempio:</h3>
+    <code style="display: block; background: var(--bg-main); padding: 1rem; border-radius: 4px; overflow-x: auto;">
+      GET /api/tags?limit=20
+    </code>
+  </div>
+
+  <!-- Response Format -->
+  <div style="background: var(--bg-card); padding: 2rem; border-radius: 8px; margin-bottom: 2rem; border: 1px solid var(--neon-cyan);">
+    <h2 style="color: var(--neon-cyan); margin-bottom: 1rem;">📋 Formato Risposta</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 1rem;">Tutte le risposte sono in formato JSON</p>
+    
+    <h3 style="font-size: 1.1em; margin: 1.5rem 0 0.5rem;">Headers:</h3>
+    <code style="display: block; background: var(--bg-main); padding: 1rem; border-radius: 4px; overflow-x: auto;">
+      Content-Type: application/json
+    </code>
+    
+    <h3 style="font-size: 1.1em; margin: 1.5rem 0 0.5rem;">CORS:</h3>
+    <p style="color: var(--text-secondary);">Le API sono accessibili da qualsiasi origine</p>
+  </div>
+
+</div>
+
+{% endblock %}

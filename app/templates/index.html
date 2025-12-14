@@ -6,71 +6,121 @@
     <h1>AI-RADAR per LLM <span>on-prem</span> &amp; AI in casa</h1>
     <p>
       Il radar quotidiano su modelli, framework e hardware per far girare
-      l’AI in locale. LLM, LangChain, Chroma, mini-PC e tutto ciò che serve
-      per un cervello distribuito “in-house”.
+      l'AI in locale. LLM, LangChain, Chroma, mini-PC e tutto ciò che serve
+      per un cervello distribuito "in-house".
     </p>
     <div class="hero-chips">
       <div class="hero-chip">
         ⚙️ Stack: LLM locali · LangChain · Transformers · ChromaDB · MiniPC · AI boxes
       </div>
       <div class="hero-chip hero-chip-secondary">
-        🛰️ Ask Observatory (Q&amp;A + RAG) già collegato all’archivio articoli.
+        🛰️ Ask Observatory (Q&amp;A + RAG) già collegato all'archivio articoli.
       </div>
     </div>
   </div>
-
-  <aside class="hero-side-panel">
-    <div class="hero-side-title">Sezione on-prem / hardware</div>
-    <!-- LOGO SECONDARIO: LLM OnPremise -->
-    <div style="margin-bottom: 0.8rem;">
-      <svg width="190" height="50" viewBox="0 0 240 60" xmlns="http://www.w3.org/2000/svg">
-        <g transform="translate(30, 30)">
-            <path d="M0,-15 L15,-7 L15,10 L0,18 L-15,10 L-15,-7 Z"
-                  fill="none"
-                  stroke="#00F3FF"
-                  stroke-width="2"
-                  stroke-linejoin="round"/>
-            <path d="M-15,-7 L0,0 L15,-7"
-                  fill="none"
-                  stroke="#00F3FF"
-                  stroke-width="1"
-                  opacity="0.5"/>
-            <path d="M0,0 L0,18"
-                  fill="none"
-                  stroke="#00F3FF"
-                  stroke-width="1"
-                  opacity="0.5"/>
-            <rect x="-4" y="-2" width="8" height="8" fill="#39FF14" rx="1">
-                <animate attributeName="fill-opacity"
-                         values="0.5;1;0.5"
-                         dur="1.5s"
-                         repeatCount="indefinite"/>
-            </rect>
-        </g>
-        <text x="60" y="36"
-              fill="#39FF14"
-              font-family="'Courier New', monospace"
-              font-weight="bold"
-              font-size="22">LLM</text>
-        <text x="105" y="36"
-              fill="white"
-              font-family="'Courier New', monospace"
-              font-size="20">OnPremise</text>
-      </svg>
-    </div>
-
-    <ul class="hero-list">
-      <li>• Scelte di mini-PC e AI boxes per modelli da 3B a 14B+ parametri.</li>
-      <li>• Trade-off tra GPU, RAM e consumi per uso “home lab”.</li>
-      <li>• Note editoriali su build reali, non solo slide da vendor.</li>
-    </ul>
-  </aside>
 </section>
+
+<!-- Floating Stats Button -->
+<button id="statsToggle" style="
+  position: fixed;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--bg-card);
+  border: 1px solid var(--neon-cyan);
+  color: var(--neon-cyan);
+  padding: 0.8rem 1rem;
+  border-radius: 8px 0 0 8px;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  z-index: 1000;
+  transition: all 0.3s;
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.5);
+" onclick="toggleStats()">
+  📊 Stats
+</button>
+
+<!-- Floating Stats Panel -->
+<aside id="statsPanel" style="
+  position: fixed;
+  right: -400px;
+  top: 0;
+  height: 100vh;
+  width: 350px;
+  background: var(--bg-card);
+  border-left: 2px solid var(--neon-cyan);
+  padding: 2rem;
+  overflow-y: auto;
+  z-index: 999;
+  transition: right 0.3s ease;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.7);
+">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h3 style="font-size: 1.2rem; color: var(--neon-cyan);">📊 Statistiche</h3>
+    <button onclick="toggleStats()" style="
+      background: transparent;
+      border: 1px solid var(--border-dim);
+      color: var(--text-muted);
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1.2rem;
+    ">×</button>
+  </div>
+  
+  <div class="hero-side-title">Archivio Totale</div>
+  <div style="font-size: 2.5rem; font-weight: bold; color: var(--neon-cyan); margin-bottom: 0.5rem;">
+    {{ total_articles }}
+  </div>
+  <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2rem;">
+    Articoli indicizzati nel sistema RAG
+  </div>
+  
+  {% if category_stats %}
+  <div class="hero-side-title" style="margin-top: 1.5rem;">Categorie</div>
+  <ul class="hero-list" style="list-style: none; padding: 0;">
+    {% for stat in category_stats %}
+    <li style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
+      <a href="/category/{{ stat.slug }}" style="color: var(--text-main); text-decoration: none; display: flex; align-items: center; gap: 0.5rem;">
+        <span style="font-size: 1.2rem;">{{ stat.icon or '📁' }}</span>
+        <span>{{ stat.name }}</span>
+      </a>
+      <span style="color: var(--neon-cyan); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;">
+        {{ stat.count }}
+      </span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  
+  <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border-dim);">
+    <a href="/rss" style="color: var(--neon-cyan); font-size: 0.85rem; text-decoration: none;">
+      📡 RSS Feed
+    </a>
+  </div>
+</aside>
+
+<script>
+function toggleStats() {
+  const panel = document.getElementById('statsPanel');
+  const button = document.getElementById('statsToggle');
+  const isOpen = panel.style.right === '0px';
+  
+  if (isOpen) {
+    panel.style.right = '-400px';
+    button.style.right = '2rem';
+  } else {
+    panel.style.right = '0px';
+    button.style.right = '370px';
+  }
+}
+</script>
 
 <section class="section-header">
   <h2>Ultime analisi &amp; news dal radar</h2>
   <p>
-    Articoli generati dall’AI sulla base dei feed, con spazio per layer
+    Articoli generati dall'AI sulla base dei feed, con spazio per layer
     editoriale umano sopra il contenuto grezzo.
   </p>
 </section>
@@ -80,8 +130,8 @@
   <article class="card">
     {% if article.image_url %}
     <div style="margin: -1.5rem -1.5rem 1rem -1.5rem; overflow: hidden; border-radius: 8px 8px 0 0;">
-      <img src="{{ article.image_url }}" alt="{{ article.title }}" 
-           style="width: 100%; height: 180px; object-fit: cover; display: block;">
+      <img src="{{ article.image_url }}" alt="{{ article.title }}" loading="lazy"
+           style="width: 100%; height: 180px; object-fit: cover; display: block; image-rendering: -webkit-optimize-contrast; image-rendering: smooth;">
     </div>
     {% endif %}
     
@@ -89,9 +139,9 @@
       <div>
         <span class="card-tag">
           {% if article.category %}
-            {{ article.category.name }}
+            {{ article.category.icon or '📁' }} {{ article.category.name }}
           {% else %}
-            Generale
+            📁 Generale
           {% endif %}
         </span>
         {% if article.ai_generated %}

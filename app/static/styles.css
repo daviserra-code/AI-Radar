@@ -298,8 +298,8 @@ header {
 
 .card:hover {
     border-color: var(--neon-cyan);
-    transform: translateY(-4px);
-    box-shadow: 0 10px 30px rgba(0, 243, 255, 0.05);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 243, 255, 0.1);
 }
 
 .card::before {
@@ -308,11 +308,49 @@ header {
     top: 0; left: 0; width: 100%; height: 2px;
     background: var(--neon-cyan);
     opacity: 0;
-    transition: 0.3s;
+    transition: 0.2s;
 }
 
 .card:hover::before {
     opacity: 1;
+}
+
+/* Fix image quality - high quality rendering for photos */
+.card img,
+article img,
+.article-detail img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: auto;
+    image-rendering: smooth;
+    -ms-interpolation-mode: bicubic;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    -webkit-font-smoothing: antialiased;
+    will-change: transform;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* Ensure crisp rendering on high-DPI displays */
+@media only screen and (-webkit-min-device-pixel-ratio: 2),
+       only screen and (min-resolution: 192dpi) {
+    .card img,
+    article img,
+    .article-detail img {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: smooth;
+    }
+}
+
+/* Disable smoothing during card hover animation to prevent blur */
+.card:hover img {
+    transform: translateZ(0) scale(1.0001);
+    filter: none;
 }
 
 .card-tag {

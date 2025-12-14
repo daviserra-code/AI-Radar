@@ -6,9 +6,9 @@ services:
     container_name: llmobs_db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: llmobs_db
-      POSTGRES_USER: llmobs_user
-      POSTGRES_PASSWORD: llmobs_pass
+      POSTGRES_DB: ${POSTGRES_DB:-llmobs_db}
+      POSTGRES_USER: ${POSTGRES_USER:-llmobs_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-llmobs_pass}
       
     volumes:
       - llmobs_pgdata:/var/lib/postgresql/data
@@ -30,16 +30,42 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     environment:
-      # FastAPI userà questa URL in app/database.py
-      DATABASE_URL: postgresql+psycopg2://llmobs_user:llmobs_pass@db:5432/llmobs_db
-      INGEST_INTERVAL_MINUTES: "5"  # ogni 3 ore, per esempio
-
-      # Qui puntiamo al container esistente "ollama" sulla stessa network
-      OLLAMA_HOST: http://ollama:11434
-
-      # QUI il modello che hai nel tuo container:
-      OLLAMA_MODEL: "llama3.2:latest"
+      # Database
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg2://llmobs_user:llmobs_pass@db:5432/llmobs_db}
+      
+      # Security
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-dev_secret_key_change_in_production}
+      JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
+      JWT_ACCESS_TOKEN_EXPIRE_MINUTES: ${JWT_ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      
+      # Application
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      DOMAIN: ${DOMAIN:-localhost:8000}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:8000,http://localhost:3000}
+      FORCE_HTTPS: ${FORCE_HTTPS:-false}
+      
+      # Ollama
+      OLLAMA_HOST: ${OLLAMA_HOST:-http://ollama:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:latest}
+      
+      # Logging
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      LOG_FILE: ${LOG_FILE:-logs/app.log}
+      
+      # Rate Limiting
+      RATE_LIMIT_ENABLED: ${RATE_LIMIT_ENABLED:-true}
+      RATE_LIMIT_PER_MINUTE: ${RATE_LIMIT_PER_MINUTE:-60}
+      
+      # Scheduler
+      FETCH_INTERVAL_MINUTES: ${FETCH_INTERVAL_MINUTES:-5}
+      ARTICLES_PER_FEED: ${ARTICLES_PER_FEED:-5}
     ports:
       - "8000:8000"
     volumes:

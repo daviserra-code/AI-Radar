@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="section-header">
+  <h1>🏷️ Tags</h1>
+  <p>Esplora gli articoli per argomento</p>
+</section>
+
+<div style="display: flex; flex-wrap: wrap; gap: 1rem; padding: 2rem 0;">
+  {% for tag in tags %}
+    <a href="/tag/{{ tag.slug }}" 
+       style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.2rem; 
+              background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-dim); 
+              border-radius: 20px; text-decoration: none; transition: all 0.2s;"
+       onmouseover="this.style.borderColor='var(--neon-cyan)'; this.style.background='rgba(0,255,255,0.1)';"
+       onmouseout="this.style.borderColor='var(--border-dim)'; this.style.background='var(--bg-card)';">
+      <span style="font-weight: 600;">{{ tag.name }}</span>
+      <span style="background: var(--neon-cyan); color: #000; padding: 0.2rem 0.5rem; border-radius: 10px; font-size: 0.8em; font-weight: 700;">
+        {{ tag.count }}
+      </span>
+    </a>
+  {% endfor %}
+</div>
+
+{% if not tags %}
+  <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+    <p>Nessun tag disponibile al momento.</p>
+  </div>
+{% endif %}
+
+{% endblock %}
