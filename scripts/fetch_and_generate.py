@@ -49,7 +49,10 @@ def ingest_from_feeds():
 
             raw_title = item["title"]
             raw_text = item["text"]
-            print(f"- Elaboro: {raw_title}")
+            source_name = item.get("source_name", "Unknown Source")
+            credibility_score = item.get("credibility_score", 3)
+            
+            print(f"- Elaboro [{source_name}]: {raw_title}")
 
             article_data = ai_client.generate_article_from_news(
                 raw_title=raw_title,
@@ -66,6 +69,8 @@ def ingest_from_feeds():
                 content_en=article_data.get("content_en", ""),
                 category_name=article_data["category"],
                 source_url=link,
+                source_name=source_name,
+                credibility_score=credibility_score,
                 image_url=image_url if image_url else None,
                 editor_comment=None,
                 ai_generated=True,

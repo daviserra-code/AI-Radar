@@ -12,6 +12,78 @@ from bs4 import BeautifulSoup
 import re
 
 
+# Source Credibility Mapping (1-5 scale)
+# 5 = Highest (Official AI Labs, Academic)
+# 4 = High (Major Tech Publications)
+# 3 = Medium (General Tech News)
+# 2 = Lower (Aggregators, Blogs)
+# 1 = Lowest (Unverified sources)
+SOURCE_CREDIBILITY = {
+    # AI Labs & Research - Highest credibility (5)
+    "OpenAI Blog": {"score": 5, "badge": "🏆", "label": "Official AI Lab", "color": "#10b981"},
+    "Anthropic News": {"score": 5, "badge": "🏆", "label": "Official AI Lab", "color": "#10b981"},
+    "Google AI Blog": {"score": 5, "badge": "🏆", "label": "Official AI Lab", "color": "#10b981"},
+    "HuggingFace Blog": {"score": 5, "badge": "🏆", "label": "Official AI Lab", "color": "#10b981"},
+    "DeepMind Blog": {"score": 5, "badge": "🏆", "label": "Official AI Lab", "color": "#10b981"},
+    "Microsoft Research": {"score": 5, "badge": "🏆", "label": "Research Lab", "color": "#10b981"},
+    "ArXiv cs.AI": {"score": 5, "badge": "🎓", "label": "Academic", "color": "#10b981"},
+    "ArXiv cs.LG": {"score": 5, "badge": "🎓", "label": "Academic", "color": "#10b981"},
+    "ArXiv cs.CL": {"score": 5, "badge": "🎓", "label": "Academic", "color": "#10b981"},
+    
+    # Major Framework/Tool Providers - High credibility (4)
+    "LangChain Blog": {"score": 4, "badge": "✅", "label": "Official Source", "color": "#3b82f6"},
+    "Ollama Blog": {"score": 4, "badge": "✅", "label": "Official Source", "color": "#3b82f6"},
+    "PyTorch Blog": {"score": 4, "badge": "✅", "label": "Official Source", "color": "#3b82f6"},
+    "TensorFlow Blog": {"score": 4, "badge": "✅", "label": "Official Source", "color": "#3b82f6"},
+    
+    # Major Tech Publications - High credibility (4)
+    "TechCrunch AI": {"score": 4, "badge": "📰", "label": "Major Publication", "color": "#3b82f6"},
+    "The Verge AI": {"score": 4, "badge": "📰", "label": "Major Publication", "color": "#3b82f6"},
+    "Ars Technica AI": {"score": 4, "badge": "📰", "label": "Major Publication", "color": "#3b82f6"},
+    "VentureBeat AI": {"score": 4, "badge": "📰", "label": "Major Publication", "color": "#3b82f6"},
+    
+    # Tech News & Hardware - Medium credibility (3)
+    "Tom's Hardware": {"score": 3, "badge": "ℹ️", "label": "Tech News", "color": "#8b5cf6"},
+    "AnandTech": {"score": 3, "badge": "ℹ️", "label": "Tech News", "color": "#8b5cf6"},
+    "AI News": {"score": 3, "badge": "ℹ️", "label": "Aggregator", "color": "#8b5cf6"},
+    "AlphaSignal.ai": {"score": 3, "badge": "ℹ️", "label": "Aggregator", "color": "#8b5cf6"},
+}
+
+
+def get_source_credibility(source_name: str) -> Dict[str, any]:
+    """Get credibility information for a source."""
+    return SOURCE_CREDIBILITY.get(source_name, {
+        "score": 3,  # Default to medium
+        "badge": "ℹ️",
+        "label": "News Source",
+        "color": "#8b5cf6"
+    })
+
+
+# RSS Feeds with source names for credibility tracking
+RSS_FEEDS = [
+    {"url": "https://openai.com/blog/rss/", "name": "OpenAI Blog"},
+    {"url": "https://www.anthropic.com/news/rss.xml", "name": "Anthropic News"},
+    {"url": "https://blog.google/technology/ai/rss/", "name": "Google AI Blog"},
+    {"url": "https://huggingface.co/blog/feed.xml", "name": "HuggingFace Blog"},
+    {"url": "https://blog.langchain.dev/rss/", "name": "LangChain Blog"},
+    {"url": "https://ollama.com/blog/rss", "name": "Ollama Blog"},
+    {"url": "https://techcrunch.com/category/artificial-intelligence/feed/", "name": "TechCrunch AI"},
+    {"url": "https://www.theverge.com/ai-artificial-intelligence/rss/index.xml", "name": "The Verge AI"},
+    {"url": "https://arstechnica.com/ai/feed/", "name": "Ars Technica AI"},
+    {"url": "https://pytorch.org/blog/feed.xml", "name": "PyTorch Blog"},
+    {"url": "https://blog.tensorflow.org/feeds/posts/default", "name": "TensorFlow Blog"},
+    {"url": "https://www.tomshardware.com/feeds/all", "name": "Tom's Hardware"},
+    {"url": "https://www.anandtech.com/rss/", "name": "AnandTech"},
+    {"url": "https://www.artificialintelligence-news.com/feed/", "name": "AI News"},
+    {"url": "https://alphasignal.ai/feed/", "name": "AlphaSignal.ai"},
+    {"url": "https://www.microsoft.com/en-us/research/feed/", "name": "Microsoft Research"},
+    {"url": "http://export.arxiv.org/rss/cs.AI", "name": "ArXiv cs.AI"},
+    {"url": "http://export.arxiv.org/rss/cs.LG", "name": "ArXiv cs.LG"},
+    {"url": "http://export.arxiv.org/rss/cs.CL", "name": "ArXiv cs.CL"},
+]
+
+
 # AI/LLM/ML related keywords for content filtering
 AI_KEYWORDS = [
     # Core AI/ML terms
@@ -124,38 +196,8 @@ def is_high_quality_image(url: str) -> bool:
     return True
 
 
-AI_FEEDS = [
-    # Major AI Labs & Research (100% AI-focused)
-    "https://openai.com/blog/rss.xml",
-    "https://huggingface.co/blog/feed.xml",
-    "https://ai.googleblog.com/feeds/posts/default",
-    "https://www.anthropic.com/news/rss.xml",
-    "https://www.deepmind.com/blog/rss.xml",
-    "https://blog.research.google/feeds/posts/default",
-    "https://www.microsoft.com/en-us/research/feed/",
-    
-    # LLM & ML Tools/Frameworks (100% AI-focused)
-    "https://blog.langchain.dev/rss.xml",
-    "https://ollama.com/blog/rss.xml",
-    "https://pytorch.org/blog/feed.xml",
-    "https://blog.tensorflow.org/feeds/posts/default",
-    
-    # AI News & Analysis - English (AI-specific feeds)
-    "https://techcrunch.com/tag/artificial-intelligence/feed/",
-    "https://www.theverge.com/ai-artificial-intelligence/rss/index.xml",
-    "https://arstechnica.com/tag/artificial-intelligence/feed/",
-    "https://venturebeat.com/category/ai/feed/",
-    "https://www.technologyreview.com/topic/artificial-intelligence/feed",
-    "https://www.artificialintelligence-news.com/feed/",
-    
-    # Developer & OSS AI
-    "https://github.blog/category/ai-and-ml/feed/",
-    
-    # Hardware - AI specific only
-    "https://www.tomshardware.com/tag/artificial-intelligence/feed/",
-    
-    # Academic & Research
-    "https://arxiv.org/rss/cs.AI",
+# Legacy AI_FEEDS kept for backward compatibility (deprecated - use RSS_FEEDS instead)
+AI_FEEDS = [feed["url"] for feed in RSS_FEEDS]
     "https://arxiv.org/rss/cs.LG",
     "https://arxiv.org/rss/cs.CL",
 ]
@@ -312,7 +354,13 @@ def fetch_raw_news(limit_per_feed: int = 5) -> List[Dict[str, str]]:
     items: List[Dict[str, str]] = []
     filtered_count = 0
 
-    for feed_url in AI_FEEDS:
+    for feed_info in RSS_FEEDS:
+        feed_url = feed_info["url"]
+        source_name = feed_info["name"]
+        credibility_info = get_source_credibility(source_name)
+        
+        print(f"\n[{credibility_info['badge']} {source_name}] Fetching...")
+        
         parsed = feedparser.parse(feed_url)
         feed_items = 0
         
@@ -349,9 +397,12 @@ def fetch_raw_news(limit_per_feed: int = 5) -> List[Dict[str, str]]:
                     "text": text,
                     "link": link,
                     "image_url": image_url or "",
+                    "source_name": source_name,
+                    "credibility_score": credibility_info["score"],
                 }
             )
             feed_items += 1
+            print(f"  ✓ {title[:60]}...")
 
     print(f"\nTotal articles: {len(items)}, Filtered out: {filtered_count}")
     return items

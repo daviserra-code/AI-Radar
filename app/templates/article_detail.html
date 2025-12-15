@@ -30,6 +30,15 @@
 
     <div class="meta meta-article">
       <span class="date">Pubblicato il {{ article.created_at.strftime("%Y-%m-%d %H:%M") }}</span>
+      {% if article.source_name and article.credibility_score %}
+        {% set badge = get_credibility_badge(article.credibility_score) %}
+        <span class="credibility-badge {{ badge.class }}" 
+              style="background: {{ badge.color }}20; border: 1px solid {{ badge.color }}; color: {{ badge.color }}; 
+                     padding: 0.4rem 0.8rem; border-radius: 4px; font-size: 0.85rem; font-weight: 600;" 
+              title="{{ badge.label }}">
+          {{ badge.badge }} {{ article.source_name }}
+        </span>
+      {% endif %}
       {% if article.source_url %}
       <span class="source-link">
         <a href="{{ article.source_url }}" target="_blank" style="color: var(--neon-cyan); font-weight: 600;">📰 Leggi l'articolo originale →</a>

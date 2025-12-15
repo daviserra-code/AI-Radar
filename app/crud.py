@@ -1,10 +1,25 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
-from typing import List, Optional
+from typing import List, Optional, Dict
 from datetime import datetime
 from slugify import slugify
 
 from . import models
+
+
+# Source Credibility Badge Configuration
+CREDIBILITY_BADGES = {
+    5: {"badge": "🏆", "label": "Official AI Lab", "color": "#10b981", "class": "credibility-highest"},
+    4: {"badge": "✅", "label": "Trusted Source", "color": "#3b82f6", "class": "credibility-high"},
+    3: {"badge": "ℹ️", "label": "News Source", "color": "#8b5cf6", "class": "credibility-medium"},
+    2: {"badge": "📝", "label": "Blog/Aggregator", "color": "#f59e0b", "class": "credibility-low"},
+    1: {"badge": "⚠️", "label": "Unverified", "color": "#ef4444", "class": "credibility-lowest"},
+}
+
+
+def get_credibility_badge(score: int) -> Dict[str, str]:
+    """Get badge information for a credibility score."""
+    return CREDIBILITY_BADGES.get(score, CREDIBILITY_BADGES[3])
 
 
 # Category icon mapping
@@ -67,6 +82,8 @@ def create_article(
     content: str,
     category_name: str,
     source_url: Optional[str] = None,
+    source_name: Optional[str] = None,
+    credibility_score: int = 3,
     image_url: Optional[str] = None,
     title_en: Optional[str] = None,
     summary_en: Optional[str] = None,
@@ -87,6 +104,8 @@ def create_article(
         content_en=content_en,
         category_id=category.id,
         source_url=source_url,
+        source_name=source_name,
+        credibility_score=credibility_score,
         image_url=image_url,
         editor_comment=editor_comment,
         ai_generated=ai_generated,

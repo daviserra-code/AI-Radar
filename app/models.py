@@ -36,6 +36,8 @@ class Article(Base):
     summary = Column(Text, nullable=True)
     content = Column(Text, nullable=False)
     source_url = Column(String(500), nullable=True)
+    source_name = Column(String(100), nullable=True)  # e.g., "OpenAI Blog", "TechCrunch AI"
+    credibility_score = Column(Integer, default=3, nullable=False)  # 1-5 scale
     image_url = Column(String(500), nullable=True)
     
     # English translations

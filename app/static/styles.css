@@ -377,6 +377,49 @@ article img,
     margin-left: 0.4rem;
 }
 
+/* Credibility Badges */
+.credibility-badge {
+    margin-left: 0.4rem;
+    font-size: 0.7rem;
+    opacity: 0.9;
+    font-weight: 600;
+}
+
+.credibility-highest {
+    /* Official AI Labs - gold/green */
+    background: rgba(16, 185, 129, 0.15) !important;
+    border-color: #10b981 !important;
+    color: #10b981 !important;
+}
+
+.credibility-high {
+    /* Trusted sources - blue */
+    background: rgba(59, 130, 246, 0.15) !important;
+    border-color: #3b82f6 !important;
+    color: #3b82f6 !important;
+}
+
+.credibility-medium {
+    /* News sources - purple */
+    background: rgba(139, 92, 246, 0.15) !important;
+    border-color: #8b5cf6 !important;
+    color: #8b5cf6 !important;
+}
+
+.credibility-low {
+    /* Blogs/aggregators - orange */
+    background: rgba(245, 158, 11, 0.15) !important;
+    border-color: #f59e0b !important;
+    color: #f59e0b !important;
+}
+
+.credibility-lowest {
+    /* Unverified - red */
+    background: rgba(239, 68, 68, 0.15) !important;
+    border-color: #ef4444 !important;
+    color: #ef4444 !important;
+}
+
 .card h3 {
     font-size: 1.25rem;
     margin-bottom: 0.75rem;

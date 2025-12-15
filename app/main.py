@@ -55,6 +55,9 @@ app.add_middleware(
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 
+# Add custom template functions
+templates.env.globals['get_credibility_badge'] = crud.get_credibility_badge
+
 # ---------------------------------------------------------------------------
 # LOGGER & SCHEDULER
 # ---------------------------------------------------------------------------
