@@ -33,7 +33,7 @@ def _call_llm(prompt: str) -> str:
         response = ollama.chat(
             model=MODEL_NAME,
             messages=[
-                {"role": "system", "content": "Sei un giornalista tecnologico professionista per un pubblico italiano. Il tuo obiettivo è scrivere- Usa \n per i newline.\n- Scrivi italiano naturale e fluente, ma MANTIENI IN INGLESE i termini tecnici standard.\n- NON TRADURRE MAI: \"debugging\", \"deployment\", \"fine-tuning\", \"pipeline\", \"framework\", \"agent\", \"benchmark\", \"open source\", \"workflow\".\n- Esempio corretto: \"Il debugging del modello\", NON \"Il debuggaggio\".\n- Esempio corretto: \"Il deployment degli agenti\", NON \"Il dispiegamento agli agenti\".\n- EVITA ASSOLUTAMENTE false friends spagnoli (es. usa \"strumento\" non \"herramienta\", \"file\" o \"archivio\" non \"fichero\").\n Usa un tono autorevole ma accessibile."},
+                {"role": "system", "content": "Sei un giornalista tecnologico professionista italiano. REGOLE FONDAMENTALI:\n\n1. GRAMMATICA ITALIANA PERFETTA:\n- Verifica SEMPRE concordanze (genere, numero, tempo)\n- Usa correttamente gli articoli (il/lo/la, un/uno/una)\n- Rispetta la consecutio temporum\n- NO errori di punteggiatura o ortografia\n\n2. TERMINI TECNICI:\n- MANTIENI IN INGLESE: debugging, deployment, fine-tuning, pipeline, framework, agent, benchmark, open source, workflow, prompt, embedding, inference, training\n- Usa articolo corretto: \"il debugging\", \"il deployment\", \"l'embedding\", \"il fine-tuning\"\n- Mai tradurre malamente: NO \"debuggaggio\", NO \"dispiegamento\", NO \"affinamento\"\n\n3. STILE:\n- Italiano naturale e scorrevole\n- Frasi chiare e ben costruite\n- Tono professionale ma accessibile\n- NO calchi dall'inglese\n- NO false friends spagnoli (usa \"strumento\" NON \"herramienta\", \"file\" NON \"fichero\")\n\n4. RILEGGI SEMPRE il testo finale per correggere errori."},
                 {"role": "user", "content": prompt},
             ],
             stream=False,
@@ -54,18 +54,24 @@ def build_news_prompt(raw_title: str, raw_text: str) -> str:
     Costruisce un prompt per trasformare una news grezza in:
     """
     return f"""
-Sei un Redattore Capo di una testata tech italiana.
+Sei un Redattore Capo di una testata tech italiana di alto livello.
 Hai ricevuto il seguente lancio di agenzia (spesso in inglese) e devi trasformarlo in un articolo premium per i tuoi lettori italiani.
 
 FONTE GREZZA:
 [TITOLO]: {raw_title}
 [TESTO]: {raw_text}
 
-ISTRUZIONI:
-1. Analizza il contenuto e capisci il "succo" della notizia.
-2. RISCRIVI completamente la notizia in ITALIANO. Non tradurre frase per frase.
-3. Se il testo originale è breve, espandi con le tue conoscenze tecniche su LLM/AI (senza inventare fatti, ma aggiungendo contesto).
-4. Evita anglicismi inutili (es. usa "addestramento" non "training" se suona meglio, ma tieni termini tecnici come "LLM", "RAG").
+ISTRUZIONI OPERATIVE:
+1. Analizza il contenuto e identifica i punti chiave della notizia
+2. RISCRIVI in ITALIANO CORRETTO E FLUENTE - NON tradurre letteralmente
+3. Se il testo originale è breve, espandi con contesto tecnico rilevante (senza inventare fatti)
+4. Usa terminologia italiana naturale, ECCETTO per termini tecnici consolidati in inglese
+
+IMPORTANTE - CONTROLLO QUALITÀ:
+- Verifica attentamente TUTTE le concordanze grammaticali (genere, numero, tempo verbale)
+- Controlla che gli articoli siano corretti (il/lo/la, i/gli/le)
+- Rileggi per eliminare errori di ortografia o sintassi
+- Assicurati che le frasi siano ben costruite e scorrevoli
 
 OUTPUT RICHIESTO (JSON):
 Devi produrre un JSON valido con questi campi:
