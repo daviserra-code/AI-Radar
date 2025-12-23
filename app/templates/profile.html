@@ -4,12 +4,12 @@
 <div class="container container-narrow">
     <div class="profile-header" style="margin-bottom: 2rem; display: flex; align-items: center; gap: 1.5rem;">
         <div class="avatar-large" style="width: 80px; height: 80px; background: var(--bg-card); border: 2px solid var(--neon-cyan); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: var(--neon-cyan);">
-            {{ user.username[0] | upper }}
+            {{ current_user.username[0] | upper }}
         </div>
         <div>
-            <h1 style="margin: 0; color: var(--text-main);">Ciao, <span style="color: var(--neon-cyan);">{{ user.username }}</span></h1>
-            <p style="margin: 0.5rem 0 0; color: var(--text-muted);">{{ user.email }}</p>
-            {% if user.is_subscribed %}
+            <h1 style="margin: 0; color: var(--text-main);">Ciao, <span style="color: var(--neon-cyan);">{{ current_user.username }}</span></h1>
+            <p style="margin: 0.5rem 0 0; color: var(--text-muted);">{{ current_user.email }}</p>
+            {% if current_user.is_subscribed %}
             <span class="pill pill-ai" style="margin-top: 0.5rem; display: inline-block;">Subscriber</span>
             {% endif %}
         </div>
@@ -66,11 +66,11 @@
             </h2>
             <div class="stats-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                 <div class="stat-item" style="text-align: center; padding: 1rem; background: var(--bg-deep); border-radius: 8px;">
-                    <span style="display: block; font-size: 2rem; font-weight: 700; color: var(--neon-cyan);">{{ user.comments|length }}</span>
+                    <span style="display: block; font-size: 2rem; font-weight: 700; color: var(--neon-cyan);">{{ current_user.comments|length }}</span>
                     <span style="font-size: 0.85rem; color: var(--text-muted);">Commenti</span>
                 </div>
                 <div class="stat-item" style="text-align: center; padding: 1rem; background: var(--bg-deep); border-radius: 8px;">
-                    <span style="display: block; font-size: 2rem; font-weight: 700; color: var(--neon-purple);">{{ (datetime.utcnow() - user.created_at).days }}</span>
+                    <span style="display: block; font-size: 2rem; font-weight: 700; color: var(--neon-purple);">{{ (datetime.utcnow() - current_user.created_at).days }}</span>
                     <span style="font-size: 0.85rem; color: var(--text-muted);">Giorni unito</span>
                 </div>
             </div>
@@ -78,7 +78,7 @@
             <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border-dim);">
                 <p style="color: var(--text-muted); font-size: 0.9rem;">
                     Abbonamento attivo: 
-                    {% if user.is_subscribed %}
+                    {% if current_user.is_subscribed %}
                     <strong style="color: var(--neon-green);">Sì</strong>
                     {% else %}
                     <strong style="color: var(--text-muted);">No</strong>
