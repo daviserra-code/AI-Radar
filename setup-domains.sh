@@ -39,9 +39,9 @@ server {
     listen 443 ssl http2;
     server_name ai-radar.it;
     
-    # SSL certificates (will be added by certbot)
-    # ssl_certificate /etc/letsencrypt/live/ai-radar.it/fullchain.pem;
-    # ssl_certificate_key /etc/letsencrypt/live/ai-radar.it/privkey.pem;
+    # Temporary self-signed cert for initial setup
+    ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
+    ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
     
     # SSL configuration
     ssl_protocols TLSv1.2 TLSv1.3;
@@ -108,9 +108,9 @@ server {
     listen 443 ssl http2;
     server_name llmonpremise.com;
     
-    # SSL certificates (will be added by certbot)
-    # ssl_certificate /etc/letsencrypt/live/llmonpremise.com/fullchain.pem;
-    # ssl_certificate_key /etc/letsencrypt/live/llmonpremise.com/privkey.pem;
+    # Temporary self-signed cert for initial setup
+    ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
+    ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
     
     # SSL configuration
     ssl_protocols TLSv1.2 TLSv1.3;
