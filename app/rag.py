@@ -11,6 +11,8 @@ from .ai_client import _call_llm, LLMError
 
 logger = logging.getLogger("ai_observer.rag")
 
+CHROMA_AVAILABLE = True
+
 CHROMA_PATH = os.getenv("CHROMA_PATH", "chroma_store")
 EMBED_MODEL_NAME = os.getenv(
     "EMBEDDING_MODEL_NAME", "sentence-transformers/all-MiniLM-L6-v2"

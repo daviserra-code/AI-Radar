@@ -104,6 +104,10 @@ def run_ingest_job():
     except Exception as e:
         logger.error("Errore generico nel job di ingest: %s", e)
 
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
+
 @app.on_event("startup")
 async def startup_event():
     logger.info("Application starting up...")

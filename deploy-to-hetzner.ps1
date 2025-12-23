@@ -7,7 +7,7 @@ param(
 
 $SERVER_IP = "46.224.91.14"
 $SERVER_USER = "root"
-$PROJECT_PATH = "/opt/ai-radar"
+$PROJECT_PATH = "/opt/AI-Radar"
 
 Write-Host "Starting deployment to Hetzner..." -ForegroundColor Cyan
 
