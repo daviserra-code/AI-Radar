@@ -108,7 +108,7 @@ async def profile_get(
     current_user: models.User = Depends(auth.get_current_user),
 ):
     return templates.TemplateResponse(
-        "profile.html", {"request": request, "user": current_user}
+        "profile.html", {"request": request, "current_user": current_user}
     )
 
 
@@ -125,14 +125,14 @@ async def profile_password_post(
     if not current_user.verify_password(current_password):
         return templates.TemplateResponse(
             "profile.html", 
-            {"request": request, "user": current_user, "error": "Password attuale non corretta"}
+            {"request": request, "current_user": current_user, "error": "Password attuale non corretta"}
         )
     
     # Verify new passwords match
     if new_password != confirm_password:
         return templates.TemplateResponse(
             "profile.html", 
-            {"request": request, "user": current_user, "error": "Le nuove password non coincidono"}
+            {"request": request, "current_user": current_user, "error": "Le nuove password non coincidono"}
         )
     
     # Update password
@@ -146,10 +146,10 @@ async def profile_password_post(
     if success:
         return templates.TemplateResponse(
             "profile.html", 
-            {"request": request, "user": current_user, "success": "Password aggiornata con successo!"}
+            {"request": request, "current_user": current_user, "success": "Password aggiornata con successo!"}
         )
     else:
         return templates.TemplateResponse(
             "profile.html", 
-            {"request": request, "user": current_user, "error": "Errore durante l'aggiornamento della password"}
+            {"request": request, "current_user": current_user, "error": "Errore durante l'aggiornamento della password"}
         )

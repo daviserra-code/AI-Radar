@@ -23,7 +23,7 @@ async def read_home(
             "request": request,
             "articles": articles,
             "category_stats": category_stats,
-            "user": current_user,
+            "current_user": current_user,
         },
     )
 
@@ -46,7 +46,7 @@ async def read_article(
         {
             "request": request,
             "article": article,
-            "user": current_user,
+            "current_user": current_user,
             "comments": comments,
             "related_articles": related_articles,
             "credibility_badge": crud.get_credibility_badge(article.credibility_score),
@@ -130,7 +130,7 @@ async def search(
             "request": request, 
             "query": q, 
             "articles": results,
-            "user": current_user
+            "current_user": current_user
         },
     )
 
