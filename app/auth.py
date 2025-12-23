@@ -49,6 +49,9 @@ def get_current_user_optional(
     # Try to get token from cookie
     elif "access_token" in request.cookies:
         token = request.cookies.get("access_token")
+        # Remove "Bearer " prefix if present
+        if token and token.startswith("Bearer "):
+            token = token[7:]
     
     if not token:
         return None
