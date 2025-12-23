@@ -96,6 +96,34 @@ def get_current_subscribed_user(
     return user
 
 
+def get_current_admin_user(
+    user: models.User = Depends(get_current_user)
+) -> models.User:
+    """
+    Get current user and verify they are admin.
+    """
+    if not user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin privileges required",
+        )
+    return user
+
+
+def get_current_admin_user(
+    user: models.User = Depends(get_current_user)
+) -> models.User:
+    """
+    Get current user and verify they are admin.
+    """
+    if not user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin privileges required",
+        )
+    return user
+
+
 def set_auth_cookie(response: Response, token: str):
     """Set authentication token in HTTP-only cookie."""
     response.set_cookie(

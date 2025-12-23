@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container margin-top">
+    <h1 style="color: var(--neon-cyan); margin-bottom: 2rem;">👥 Gestione Utenti</h1>
+
+    <div style="overflow-x: auto; background: var(--bg-card); border: 1px solid var(--border-dim); border-radius: 8px;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--border-dim);">
+                    <th style="padding: 1rem; color: var(--text-muted);">ID</th>
+                    <th style="padding: 1rem; color: var(--text-muted);">Username</th>
+                    <th style="padding: 1rem; color: var(--text-muted);">Email</th>
+                    <th style="padding: 1rem; color: var(--text-muted);">Status</th>
+                    <th style="padding: 1rem; color: var(--text-muted);">Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr style="border-bottom: 1px solid var(--border-dim); transition: background 0.2s;" class="hover-row">
+                    <td style="padding: 1rem; color: var(--text-muted);">{{ u.id }}</td>
+                    <td style="padding: 1rem; color: var(--text-main); font-weight: 600;">
+                        {{ u.username }}
+                        {% if u.is_admin %}
+                        <span
+                            style="display: inline-block; padding: 0.2rem 0.5rem; background: rgba(0, 243, 255, 0.1); color: var(--neon-cyan); border-radius: 4px; font-size: 0.7em; border: 1px solid var(--neon-cyan);">ADMIN</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 1rem; color: var(--text-main);">{{ u.email }}</td>
+                    <td style="padding: 1rem;">
+                        {% if u.is_active %}
+                        <span style="color: var(--neon-green);">Attivo</span>
+                        {% else %}
+                        <span style="color: #ef4444;">Bannato</span>
+                        {% endif %}
+                        <br>
+                        {% if u.is_subscribed %}
+                        <span style="color: var(--neon-purple); font-size: 0.85em;">Subscriber</span>
+                        {% else %}
+                        <span style="color: var(--text-muted); font-size: 0.85em;">Free</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <!-- BAN/UNBAN -->
+                        <form method="post" action="/admin/users/{{ u.id }}/toggle-active" style="display:inline;">
+                            <button type="submit"
+                                style="cursor:pointer; padding: 0.3rem 0.6rem; border: 1px solid {{ '#ef4444' if u.is_active else '#10b981' }}; color: {{ '#ef4444' if u.is_active else '#10b981' }}; background: transparent; border-radius: 4px;">
+                                {{ 'Ban' if u.is_active else 'Unban' }}
+                            </button>
+                        </form>
+
+                        <!-- TOGGLE SUB -->
+                        <form method="post" action="/admin/users/{{ u.id }}/toggle-subscription"
+                            style="display:inline;">
+                            <button type="submit"
+                                style="cursor:pointer; padding: 0.3rem 0.6rem; border: 1px solid var(--neon-purple); color: var(--neon-purple); background: transparent; border-radius: 4px;">
+                                {{ 'Rimuovi Sub' if u.is_subscribed else 'Dai Sub' }}
+                            </button>
+                        </form>
+
+                        <!-- TOGGLE ADMIN -->
+                        {% if u.id != current_user.id %}
+                        <form method="post" action="/admin/users/{{ u.id }}/toggle-admin" style="display:inline;"
+                            onsubmit="return confirm('Sei sicuro di cambiare i privilegi admin?');">
+                            <button type="submit"
+                                style="cursor:pointer; padding: 0.3rem 0.6rem; border: 1px solid var(--neon-cyan); color: var(--neon-cyan); background: transparent; border-radius: 4px;">
+                                {{ 'Demuovi' if u.is_admin else 'Promuovi' }}
+                            </button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .hover-row:hover {
+        background: rgba(255, 255, 255, 0.03);
+    }
+</style>
+
+{% endblock %}

@@ -47,6 +47,7 @@ SOURCE_CREDIBILITY = {
     "AnandTech": {"score": 3, "badge": "ℹ️", "label": "Tech News", "color": "#8b5cf6"},
     "AI News": {"score": 3, "badge": "ℹ️", "label": "Aggregator", "color": "#8b5cf6"},
     "AlphaSignal.ai": {"score": 3, "badge": "ℹ️", "label": "Aggregator", "color": "#8b5cf6"},
+    "Tech Titans": {"score": 3, "badge": "🏢", "label": "Industry Org", "color": "#8b5cf6"},
 }
 
 
@@ -81,6 +82,7 @@ RSS_FEEDS = [
     {"url": "http://export.arxiv.org/rss/cs.AI", "name": "ArXiv cs.AI"},
     {"url": "http://export.arxiv.org/rss/cs.LG", "name": "ArXiv cs.LG"},
     {"url": "http://export.arxiv.org/rss/cs.CL", "name": "ArXiv cs.CL"},
+    {"url": "https://www.techtitans.org/feed", "name": "Tech Titans"},
 ]
 
 
@@ -115,6 +117,17 @@ AI_KEYWORDS = [
     'ai accelerator', 'neural processing'
 ]
 
+# Keywords to EXCLUDE (commercial, deals, unrelated)
+AI_EXCLUDE_KEYWORDS = [
+    'deal', 'price', 'sale', 'off', 'discount', 'amazon', 'coupon', 'promo',
+    'buy', 'sconto', 'offerta', 'prezzo', 'miglior', 'recensione', 'review',
+    'laptop', 'monitor', 'tv', 'smartphone', 'router', 'mouse', 'keyboard',
+    'headphone', 'cuffie', 'speaker', 'vacuum', 'robot', 'cleaning',
+    'gaming', 'console', 'ps5', 'xbox', 'nintendo', 'steam', 'game',
+    'ssd', 'ddr', 'ram', 'nvme', 'hard drive', 'storage',
+    'black friday', 'prime day', 'cyber monday',
+]
+
 
 def is_ai_related(title: str, text: str) -> bool:
     """
@@ -123,11 +136,19 @@ def is_ai_related(title: str, text: str) -> bool:
     """
     combined = (title + " " + text).lower()
     
+    # First, check for EXCLUSION keywords (deals, hardware spam)
+    for exclude in AI_EXCLUDE_KEYWORDS:
+        # Check as whole words to avoid false positives
+        # e.g. "deal" in "ideal" should be allowed
+        if f" {exclude} " in f" {combined} ":
+            print(f"    [EXCLUDED] Found exclusion keyword: {exclude}")
+            return False
+
     # Check for AI keywords
     for keyword in AI_KEYWORDS:
         if keyword in combined:
             return True
-    
+            
     return False
 
 
@@ -198,9 +219,6 @@ def is_high_quality_image(url: str) -> bool:
 
 # Legacy AI_FEEDS kept for backward compatibility (deprecated - use RSS_FEEDS instead)
 AI_FEEDS = [feed["url"] for feed in RSS_FEEDS]
-    "https://arxiv.org/rss/cs.LG",
-    "https://arxiv.org/rss/cs.CL",
-]
 
 
 def extract_high_res_image(url: str) -> Optional[str]:
@@ -344,13 +362,25 @@ def get_best_image_url(entry, article_url: str) -> Optional[str]:
     return image_url
 
 
-def fetch_raw_news(limit_per_feed: int = 5) -> List[Dict[str, str]]:
+
+def fetch_raw_news(limit_per_feed: int = 5, lookback_days: int = 7) -> List[Dict[str, str]]:
     """
     Ritorna una lista di dict:
       { "title": ..., "text": ..., "link": ..., "image_url": ... }
     per tutte le sorgenti definite in AI_FEEDS.
     Filters content to ensure it's AI/LLM/ML related.
+    
+    Args:
+        limit_per_feed: Max articles per feed
+        lookback_days: Max age of articles in days (default 7)
     """
+    from datetime import datetime, timedelta
+    from time import mktime
+    
+    cutoff_date = datetime.utcnow() - timedelta(days=lookback_days)
+    print(f"Fetching news since {cutoff_date.strftime('%Y-%m-%d')}...")
+
+
     items: List[Dict[str, str]] = []
     filtered_count = 0
 
@@ -359,7 +389,7 @@ def fetch_raw_news(limit_per_feed: int = 5) -> List[Dict[str, str]]:
         source_name = feed_info["name"]
         credibility_info = get_source_credibility(source_name)
         
-        print(f"\n[{credibility_info['badge']} {source_name}] Fetching...")
+        print(f"\n[SCAN] {source_name} Fetching...")
         
         parsed = feedparser.parse(feed_url)
         feed_items = 0
@@ -372,6 +402,15 @@ def fetch_raw_news(limit_per_feed: int = 5) -> List[Dict[str, str]]:
             title = getattr(entry, "title", "").strip()
             link = getattr(entry, "link", "").strip()
             summary = getattr(entry, "summary", "")
+            
+            # Date filtering
+            published_parsed = getattr(entry, "published_parsed", None) or getattr(entry, "updated_parsed", None)
+            if published_parsed:
+                published_dt = datetime.fromtimestamp(mktime(published_parsed))
+                if published_dt < cutoff_date:
+                    # Skip old articles
+                    continue
+            
             content = ""
             if hasattr(entry, "content"):
                 blocks = getattr(entry, "content", [])
@@ -385,7 +424,7 @@ def fetch_raw_news(limit_per_feed: int = 5) -> List[Dict[str, str]]:
             # Filter: Only include AI/LLM/ML related content
             if not is_ai_related(title, text):
                 filtered_count += 1
-                print(f"  [FILTERED] Non-AI content: {title[:60]}...")
+                # print(f"  [FILTERED] Non-AI content: {title[:60]}...")
                 continue
 
             # Extract high-resolution image
@@ -402,7 +441,7 @@ def fetch_raw_news(limit_per_feed: int = 5) -> List[Dict[str, str]]:
                 }
             )
             feed_items += 1
-            print(f"  ✓ {title[:60]}...")
+            print(f"  [OK] {title[:60]}...")
 
     print(f"\nTotal articles: {len(items)}, Filtered out: {filtered_count}")
     return items

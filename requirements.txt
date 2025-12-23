@@ -16,4 +16,5 @@ sentence-transformers
 pydantic[email]
 bcrypt
 python-jose[cryptography]
-
+markdown
+bleach

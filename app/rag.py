@@ -23,8 +23,11 @@ _collection = _client.get_or_create_collection("articles")
 _embedder: SentenceTransformer | None = None
 
 
-def _get_embedder() -> SentenceTransformer:
+def _get_embedder():
     global _embedder
+    if not CHROMA_AVAILABLE or SentenceTransformer is None:
+        return None
+        
     if _embedder is None:
         logger.info("Caricamento modello di embedding: %s", EMBED_MODEL_NAME)
         _embedder = SentenceTransformer(EMBED_MODEL_NAME)
@@ -33,6 +36,8 @@ def _get_embedder() -> SentenceTransformer:
 
 def _embed(texts: List[str]) -> List[List[float]]:
     model = _get_embedder()
+    if not model:
+        return []
     vectors = model.encode(texts, show_progress_bar=False)
     return vectors.tolist()
 
@@ -50,6 +55,10 @@ def rebuild_index(db: Session) -> None:
     except Exception:
         # Se è già vuota o altro, non ci interessa troppo
         pass
+
+    if not CHROMA_AVAILABLE or not _collection:
+        logger.warning("ChromaDB non disponibile: indicizzazione saltata.")
+        return
 
     if not articles:
         logger.info("Nessun articolo in DB: indice RAG vuoto.")
@@ -82,6 +91,9 @@ def get_relevant_articles(
     """
     Ritorna una lista di articoli dal DB ordinati per rilevanza rispetto alla domanda.
     """
+    if not CHROMA_AVAILABLE or not _collection:
+        return []
+
     try:
         count = _collection.count()
     except Exception:

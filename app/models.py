@@ -92,6 +92,9 @@ class Comment(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
+    is_deleted = Column(Boolean, default=False)
+    is_edited = Column(Boolean, default=False)
+    
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     article_id = Column(Integer, ForeignKey("articles.id"), nullable=False)
     

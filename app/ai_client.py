@@ -33,7 +33,7 @@ def _call_llm(prompt: str) -> str:
         response = ollama.chat(
             model=MODEL_NAME,
             messages=[
-                {"role": "system", "content": "Sei un giornalista tecnologico professionista. Scrivi articoli chiari, accurati e grammaticalmente corretti in italiano. Usa un linguaggio naturale e fluente, evitando traduzioni letterali dall'inglese."},
+                {"role": "system", "content": "Sei un giornalista tecnologico professionista per un pubblico italiano. Il tuo obiettivo è scrivere- Usa \n per i newline.\n- Scrivi italiano naturale e fluente, ma MANTIENI IN INGLESE i termini tecnici standard.\n- NON TRADURRE MAI: \"debugging\", \"deployment\", \"fine-tuning\", \"pipeline\", \"framework\", \"agent\", \"benchmark\", \"open source\", \"workflow\".\n- Esempio corretto: \"Il debugging del modello\", NON \"Il debuggaggio\".\n- Esempio corretto: \"Il deployment degli agenti\", NON \"Il dispiegamento agli agenti\".\n- EVITA ASSOLUTAMENTE false friends spagnoli (es. usa \"strumento\" non \"herramienta\", \"file\" o \"archivio\" non \"fichero\").\n Usa un tono autorevole ma accessibile."},
                 {"role": "user", "content": prompt},
             ],
             stream=False,
@@ -52,97 +52,108 @@ def _call_llm(prompt: str) -> str:
 def build_news_prompt(raw_title: str, raw_text: str) -> str:
     """
     Costruisce un prompt per trasformare una news grezza in:
-      - titolo ottimizzato
-      - riassunto
-      - articolo esteso
-      - categoria macro (LLM / Frameworks / Hardware / Market / Altro)
     """
     return f"""
-Sei un analista esperto di notizie su AI e tecnologia.
+Sei un Redattore Capo di una testata tech italiana.
+Hai ricevuto il seguente lancio di agenzia (spesso in inglese) e devi trasformarlo in un articolo premium per i tuoi lettori italiani.
 
-Ho questo articolo grezzo (titolo + testo).
+FONTE GREZZA:
+[TITOLO]: {raw_title}
+[TESTO]: {raw_text}
 
-TITOLO:
-[INIZIO_TITOLO]
-{raw_title}
-[FINE_TITOLO]
+ISTRUZIONI:
+1. Analizza il contenuto e capisci il "succo" della notizia.
+2. RISCRIVI completamente la notizia in ITALIANO. Non tradurre frase per frase.
+3. Se il testo originale è breve, espandi con le tue conoscenze tecniche su LLM/AI (senza inventare fatti, ma aggiungendo contesto).
+4. Evita anglicismi inutili (es. usa "addestramento" non "training" se suona meglio, ma tieni termini tecnici come "LLM", "RAG").
 
-TESTO:
-[INIZIO_TESTO]
-{raw_text}
-[FINE_TESTO]
+OUTPUT RICHIESTO (JSON):
+Devi produrre un JSON valido con questi campi:
+- "title": Titolo accattivante in Italiano (max 90 char).
+- "title_en": Titolo in Inglese.
+- "summary": Sommario giornalistico in Italiano (max 80 parole).
+- "summary_en": Summary in English.
+- "content": L'articolo completo in ITALIANO (Markdown). Deve essere ricco, diviso in paragrafi con titoli (##).
+- "content_en": The complete article in ENGLISH (Markdown).
+- "category": Scegli UNA tra [LLM, Frameworks, Hardware, Market, Other].
 
-Crea DUE versioni complete dell'articolo: una in ITALIANO e una in INGLESE.
-
-1. Titolo chiaro e tecnico (max 90 caratteri) in ITALIANO e INGLESE
-2. Riassunto in 2-3 frasi (max 80 parole) in ITALIANO e INGLESE
-3. Articolo esteso e DETTAGLIATO (800-1500 parole) in ITALIANO e INGLESE con:
-   - Introduzione con contesto
-   - Sezioni con sottotitoli (usa ## per le intestazioni)
-   - Dettagli tecnici specifici
-   - Implicazioni pratiche
-   - Conclusione con prospettive future
-   - Usa formattazione Markdown (grassetto, liste, codice)
-4. Scegli UNA categoria tra: LLM, Frameworks, Hardware, Market, Other.
-
-IMPORTANTE:
-- Rispondi SOLO con JSON valido.
-- Nessun commento fuori dal JSON.
-- Usa esattamente queste chiavi: "title", "title_en", "summary", "summary_en", "content", "content_en", "category".
-- NON usare backticks (`) nel JSON, solo virgolette doppie (").
-- I campi "content" e "content_en" devono essere STRINGHE, NON oggetti.
-- Usa \\n per i newline.
-- Scrivi italiano naturale e fluente, non traduzione letterale.
-
-Esempio formato (segui questo schema esattamente):
-
+Esempio JSON:
 {{
-  "title": "Titolo in italiano...",
-  "title_en": "Title in English...",
-  "summary": "Riassunto in italiano...",
-  "summary_en": "Summary in English...",
-  "content": "## Introduzione\\n\\nContenuto lungo in italiano...\\n\\n## Dettagli\\n\\nAltro contenuto...",
-  "content_en": "## Introduction\\n\\nLong content in English...\\n\\n## Details\\n\\nMore content...",
-  "category": "LLM"
+  "title": "Nuova svolta per i modelli Llama...",
+  "content": "## Introduzione\\n\\nMeta ha annunciato oggi...",
+  ...
 }}
 
-RICORDA: "content" e "content_en" sono STRINGHE!
+IMPORTANTE:
+- Restituisci SOLO il JSON.
+- Assicurati che il JSON sia sintatticamente perfetto.
 """
 
 
 def _extract_json_block(text: str) -> str:
     """
-    I modelli piccoli a volte si "scordano" di stare zitti.
-    Qui cerchiamo il primo '{' e l'ultima '}' e proviamo a estrarre un blocco JSON.
-    Inoltre, rimuoviamo i markdown code blocks se presenti e gestiamo i backticks nei valori.
+    Extracts JSON block by finding the outer-most matching braces,
+    ignoring braces inside strings.
     """
-    # Rimuovi i markdown code blocks se presenti
-    text = text.replace("```json", "").replace("```", "")
-    
-    start = text.find("{")
-    end = text.rfind("}")
-    if start == -1 or end == -1 or end <= start:
-        raise LLMError("Impossibile trovare un blocco JSON nella risposta del modello.")
-    
-    json_block = text[start : end + 1]
-    
-    # Fix: il modello a volte usa backticks per valori multilinea invece di stringhe JSON valide
-    # Sostituisci pattern come "content": `...` con "content": "..."
-    # Dobbiamo gestire anche il caso multilinea
+    # 1. Try to find content within ```json code fence (safest if model complies)
     import re
+    match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', text, re.DOTALL)
+    if match:
+        # Check if the regex match is actually valid JSON (it might have stopped early on nested braces if regex is weak)
+        # But if we assume the model closes the code block correctly, we can trust the content inside the block.
+        # Actually better to rely on the sophisticated parser for the content inside, 
+        # or just take the block if it looks complete.
+        # Let's trust the parser below more, but use the code block start as a hint.
+        block_content = match.group(1)
+        # Verify if balanced? No, let's just fall through to the robust parser
+        # starting from the first { found in the text.
+        pass
+
+    # Find the first '{'
+    start_index = text.find('{')
+    if start_index == -1:
+        raise LLMError("No JSON object found (missing '{')")
+
+    # Parsing state
+    balance = 0
+    in_string = False
+    escape = False
     
-    # Pattern per trovare "key": `multiline value` e sostituirlo con "key": "escaped value"
-    def replace_backtick_value(match):
-        key = match.group(1)
-        value = match.group(2)
-        # Escape delle virgolette e newline nel valore
-        value = value.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n').replace('\r', '\\r').replace('\t', '\\t')
-        return f'"{key}": "{value}"'
+    end_index = -1
     
-    # Cerca pattern come "key": `value`
-    json_block = re.sub(r'"(\w+)":\s*`([^`]*)`', replace_backtick_value, json_block, flags=re.DOTALL)
+    for i, char in enumerate(text[start_index:], start=start_index):
+        if in_string:
+            if escape:
+                escape = False
+            elif char == '\\':
+                escape = True
+            elif char == '"':
+                in_string = False
+        else:
+            if char == '"':
+                in_string = True
+            elif char == '{':
+                balance += 1
+            elif char == '}':
+                balance -= 1
+                if balance == 0:
+                    end_index = i
+                    break
     
-    return json_block
+    if end_index != -1:
+        json_candidate = text[start_index : end_index + 1]
+        
+        # Cleanup potential backticks inside keys/values if the model hallucinated them
+        # E.g. "key": `value` -> "key": "value"
+        # Be careful not to break valid json
+        candidate_clean = re.sub(r':\s*`([^`]*)`', r': "\1"', json_candidate)
+        
+        # Remove trailing commas before closing braces/brackets
+        candidate_clean = re.sub(r',\s*([}\]])', r'\1', candidate_clean, flags=re.DOTALL)
+        
+        return candidate_clean
+
+    raise LLMError("Could not find matching closing '}' for JSON block")
 
 
 def generate_article_from_news(raw_title: str, raw_text: str) -> Dict[str, str]:

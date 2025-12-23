@@ -58,6 +58,15 @@ CATEGORY_DESCRIPTIONS = {
 }
 
 
+def get_category_icon(category_slug: str) -> str:
+    """Get icon for a category slug."""
+    # Normalize slug
+    if not category_slug:
+        return "📁"
+    slug = category_slug.lower().strip()
+    return CATEGORY_ICONS.get(slug, "📁")
+
+
 def create_category_if_not_exists(db: Session, name: str) -> models.Category:
     slug = slugify(name)
     category = db.query(models.Category).filter_by(slug=slug).first()
@@ -250,6 +259,81 @@ def authenticate_user(db: Session, username: str, password: str) -> Optional[mod
     return user
 
 
+def update_user_password(db: Session, user_id: int, new_password: str) -> bool:
+    """Update user password."""
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        return False
+    
+    user.hashed_password = models.User.hash_password(new_password)
+    db.commit()
+    return True
+
+
+def update_user_profile(
+    db: Session, 
+    user_id: int, 
+    email: Optional[str] = None,
+    is_subscribed: Optional[bool] = None
+) -> Optional[models.User]:
+    """Update user profile fields."""
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        return None
+        
+    if email:
+        # Check if email is taken by another user
+        existing = db.query(models.User).filter(
+            models.User.email == email,
+            models.User.id != user_id
+        ).first()
+        if existing:
+            raise ValueError("Email already registered")
+        user.email = email
+        
+    if is_subscribed is not None:
+        user.is_subscribed = is_subscribed
+        
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def get_all_users(db: Session, limit: int = 100) -> List[models.User]:
+    """Get all users ordered by creation date."""
+    return db.query(models.User).order_by(models.User.created_at.desc()).limit(limit).all()
+
+
+def toggle_user_active(db: Session, user_id: int) -> Optional[models.User]:
+    """Toggle user active status (Ban/Unban)."""
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user:
+        user.is_active = not user.is_active
+        db.commit()
+        db.refresh(user)
+    return user
+
+
+def toggle_user_admin(db: Session, user_id: int) -> Optional[models.User]:
+    """Toggle user admin status."""
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user:
+        user.is_admin = not user.is_admin
+        db.commit()
+        db.refresh(user)
+    return user
+
+
+def toggle_user_subscription(db: Session, user_id: int) -> Optional[models.User]:
+    """Toggle user subscription status manually."""
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user:
+        user.is_subscribed = not user.is_subscribed
+        db.commit()
+        db.refresh(user)
+    return user
+
+
 # ===== COMMENT MANAGEMENT =====
 
 def create_comment(
@@ -281,13 +365,29 @@ def get_comments_by_article(db: Session, article_id: int) -> List[models.Comment
 
 
 def delete_comment(db: Session, comment_id: int, user_id: int) -> bool:
-    """Delete a comment if the user owns it."""
+    """Soft delete a comment if the user owns it."""
     comment = db.query(models.Comment).filter(
         models.Comment.id == comment_id,
         models.Comment.user_id == user_id
     ).first()
     if comment:
-        db.delete(comment)
+        comment.is_deleted = True
+        db.commit()
+        return True
+    return False
+
+
+def update_comment(db: Session, comment_id: int, user_id: int, new_content: str) -> bool:
+    """Update comment content."""
+    comment = db.query(models.Comment).filter(
+        models.Comment.id == comment_id,
+        models.Comment.user_id == user_id
+    ).first()
+    
+    if comment and not comment.is_deleted:
+        comment.content = new_content
+        comment.is_edited = True
+        # updated_at is handled automatically by SQLAlchemy onupdate
         db.commit()
         return True
     return False
