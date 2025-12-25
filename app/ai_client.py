@@ -26,25 +26,76 @@ class LLMError(Exception):
 
 def _call_llm(prompt: str) -> str:
     """
-    Chiama il modello Ollama in locale usando la libreria ufficiale.
-    Ritorna il testo della risposta (content) così com'è.
+    Chiama il modello Ollama in locale usando HTTPX per controllo timeout.
+    Ritorna il testo della risposta (content) così com'è. 
+    Timeout impostato a 120 secondi.
     """
+    import logging
+    import httpx
+    
+    logger = logging.getLogger(__name__)
+    
+    # URL di default se OLLAMA_HOST non è settato o è solo base url
+    host = os.getenv("OLLAMA_HOST", "http://127.0.0.1:11434")
+    # Assicurati che l'host non abbia trailing slash
+    host = host.rstrip("/")
+    url = f"{host}/api/chat"
+
+    payload = {
+        "model": MODEL_NAME,
+        "messages": [
+            {"role": "system", "content": """Sei un giornalista tech italiano di alto livello (stile Wired/Il Sole 24 Ore).
+
+REGOLE CRITICHE DI TRADUZIONE (PENALITÀ MASSIMA SE VIOLATE):
+1.  **MAI TRADURRE "Large Language Models"** in "Modelli di Lingua Grandi". Usa SEMPRE "LLM" o "Large Language Models".
+2.  **MAI TRADURRE "Fine-tuning"** in "Sintonizzazione fine". Usa "Fine-tuning".
+3.  **MAI TRADURRE "Framework"** in "Quadro". Usa "Framework".
+4.  **MAI TRADURRE "Pipeline"** in "Tubatura". Usa "Pipeline".
+5.  **MAI TRADURRE "Token"** in "Gettoni". Usa "Token" o "Token".
+6.  **MAI TRADURRE "Benchmark"** in "Panchina". Usa "Benchmark".
+7.  **MAI TRADURRE "Embeddings"** in "Immergimenti". Usa "Embeddings".
+8.  **ATTENZIONE AI FALSI AMICI**:
+    - "Library" -> "Libreria" (software), NON "Biblioteca".
+    - "License" -> "Licenza", NON "Licenziare" (salvo contesto lavorativo).
+    - "Silicon" -> "Silicio", NON "Silicone".
+
+REGOLE FORMATO JSON (NON USARE YAML):
+- **NON USARE `|` per stringhe multilinea.**
+- Usa `\n` per a capo all'interno delle stringhe JSON.
+- Il JSON deve essere valido al 100%.
+
+STILE DI SCRITTURA:
+- Scrivi in un italiano fluido, professionale e giornalistico.
+- Evita costruzioni passive anglofone ("è stato sviluppato da" -> "XY ha sviluppato").
+- Usa un tono divulgativo ma tecnico.
+"""},
+            {"role": "user", "content": prompt},
+        ],
+        "options": {
+            "temperature": 0.3,
+        },
+        "stream": False,
+    }
+
     try:
-        response = ollama.chat(
-            model=MODEL_NAME,
-            messages=[
-                {"role": "system", "content": "Sei un giornalista tecnologico professionista italiano. REGOLE FONDAMENTALI:\n\n1. GRAMMATICA ITALIANA PERFETTA:\n- Verifica SEMPRE concordanze (genere, numero, tempo)\n- Usa correttamente gli articoli (il/lo/la, un/uno/una)\n- Rispetta la consecutio temporum\n- NO errori di punteggiatura o ortografia\n\n2. TERMINI TECNICI:\n- MANTIENI IN INGLESE: debugging, deployment, fine-tuning, pipeline, framework, agent, benchmark, open source, workflow, prompt, embedding, inference, training\n- Usa articolo corretto: \"il debugging\", \"il deployment\", \"l'embedding\", \"il fine-tuning\"\n- Mai tradurre malamente: NO \"debuggaggio\", NO \"dispiegamento\", NO \"affinamento\"\n\n3. STILE:\n- Italiano naturale e scorrevole\n- Frasi chiare e ben costruite\n- Tono professionale ma accessibile\n- NO calchi dall'inglese\n- NO false friends spagnoli (usa \"strumento\" NON \"herramienta\", \"file\" NON \"fichero\")\n\n4. RILEGGI SEMPRE il testo finale per correggere errori."},
-                {"role": "user", "content": prompt},
-            ],
-            stream=False,
-        )
+        logger.info(f"Chiamata a Ollama (model={MODEL_NAME}) su {url}...")
+        
+        # TIMEOUT ESPLICITO: 120 secondi
+        with httpx.Client(timeout=120.0) as client:
+            resp = client.post(url, json=payload)
+            resp.raise_for_status()
+            response_data = resp.json()
+            
+        logger.info("Risposta ricevuta da Ollama.")
     except Exception as e:
+        logger.error(f"Errore nella chiamata a Ollama (HTTPX): {e}")
         raise LLMError(f"Errore nella chiamata a Ollama: {e}")
 
     try:
-        content = response["message"]["content"]
+        content = response_data["message"]["content"]
     except Exception:
-        raise LLMError(f"Risposta inattesa da Ollama: {response}")
+        logger.error(f"Risposta inattesa: {response_data}")
+        raise LLMError(f"Risposta inattesa da Ollama: {response_data}")
 
     return content
 
@@ -65,7 +116,8 @@ ISTRUZIONI OPERATIVE:
 1. Analizza il contenuto e identifica i punti chiave della notizia
 2. RISCRIVI in ITALIANO CORRETTO E FLUENTE - NON tradurre letteralmente
 3. Se il testo originale è breve, espandi con contesto tecnico rilevante (senza inventare fatti)
-4. Usa terminologia italiana naturale, ECCETTO per termini tecnici consolidati in inglese
+4. Usa terminologia italiana naturale.
+5. EVITA ASSOLUTAMENTE traduzioni letterali ridicole come "Modelli di Lingua Grandi" (tieni LLM) o "potenze" per "power supply" (usa alimentatori).
 
 IMPORTANTE - CONTROLLO QUALITÀ:
 - Verifica attentamente TUTTE le concordanze grammaticali (genere, numero, tempo verbale)

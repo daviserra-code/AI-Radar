@@ -20,11 +20,15 @@ def check_all_articles():
         print(f"Total articles in database: {total_count}")
 
         if total_count > 0:
-            latest_article = session.query(Article).order_by(Article.created_at.desc()).first()
-            oldest_article = session.query(Article).order_by(Article.created_at.asc()).first()
-            
-            print(f"Most recent article: {latest_article.title} (Date: {latest_article.created_at})")
-            print(f"Oldest article: {oldest_article.title} (Date: {oldest_article.created_at})")
+            # Print details of the last 3 articles
+            recent_articles = session.query(Article).order_by(Article.created_at.desc()).limit(3).all()
+            print(f"\n--- Analysis of the last {len(recent_articles)} articles ---\n")
+            for i, art in enumerate(recent_articles):
+                print(f"[{i+1}] TITLE: {art.title}")
+                print(f"    DATE:  {art.created_at}")
+                print(f"    SUMMARY: {art.summary}")
+                print(f"    SNIPPET: {art.content[:200]}...") 
+                print("-" * 50)
         else:
             print("The articles table is completely empty.")
 

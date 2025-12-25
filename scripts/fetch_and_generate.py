@@ -9,6 +9,7 @@ Pipeline:
 
 import os
 import sys
+import logging
 from sqlalchemy.orm import Session
 
 ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -42,19 +43,29 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
-    print(f"Starting ingest: {args.limit} articles/feed, last {args.days} days, fast_mode={args.fast}")
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        handlers=[
+            logging.FileHandler(os.path.join(ROOT_DIR, "logs", "app.log")),
+            logging.StreamHandler(sys.stdout)
+        ]
+    )
+    logger = logging.getLogger("fetch_and_generate")
+
+    logger.info(f"Starting ingest: {args.limit} articles/feed, last {args.days} days, fast_mode={args.fast}")
     
     db: Session = SessionLocal()
     try:
         raw_items = fetch_raw_news(limit_per_feed=args.limit, lookback_days=args.days)
-        print(f"Trovate {len(raw_items)} news grezze dai feed.")
+        logger.info(f"Trovate {len(raw_items)} news grezze dai feed.")
 
         for item in raw_items:
             link = item["link"]
             image_url = item.get("image_url", "")
 
             if article_exists_by_source(db, link):
-                # print(f"- Già presente, skip: {link}")
+                # logger.debug(f"- Già presente, skip: {link}")
                 continue
 
             raw_title = item["title"]
@@ -62,7 +73,7 @@ if __name__ == "__main__":
             source_name = item.get("source_name", "Unknown Source")
             credibility_score = item.get("credibility_score", 3)
             
-            print(f"- Elaboro [{source_name}]: {raw_title[:50]}...")
+            logger.info(f"- Elaboro [{source_name}]: {raw_title[:50]}...")
 
             if args.fast:
                 # Fast mode: Create article directly without LLM
@@ -83,13 +94,15 @@ if __name__ == "__main__":
                         editor_comment="IMPORTED FAST MODE (Raw Data)",
                         ai_generated=False,
                     )
-                    print(f"  -> [FAST] Salvato: {article.title[:40]}...")
+                    logger.info(f"  -> [FAST] Salvato: {article.title[:40]}...")
                 except Exception as e:
-                    print(f"  [ERROR] Fast save failed for {link}: {e}")
+                    logger.error(f"  [ERROR] Fast save failed for {link}: {e}")
                 continue
 
             # Slow mode: Use LLM
             try:
+                # Add a simple timeout mechanism if ollama hangs (simulated via thread or just hope the lib doesn't hang forever)
+                # For now rely on the logger to at least tell us it started.
                 article_data = ai_client.generate_article_from_news(
                     raw_title=raw_title,
                     raw_text=raw_text,
@@ -111,10 +124,10 @@ if __name__ == "__main__":
                     editor_comment=None,
                     ai_generated=True,
                 )
-                print(f"  -> [AI] Creato articolo: {article.title} ({article.category.name})")
+                logger.info(f"  -> [AI] Creato articolo: {article.title} ({article.category.name})")
             except Exception as e:
-                print(f"  [ERROR] Processing failed for {link}: {e}")
+                logger.error(f"  [ERROR] Processing failed for {link}: {e}")
 
-        print("Ingest completato.")
+        logger.info("Ingest completato.")
     finally:
         db.close()
