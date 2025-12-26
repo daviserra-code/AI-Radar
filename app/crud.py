@@ -670,9 +670,28 @@ def get_articles_by_tag(db: Session, tag_slug: str, limit: int = 50) -> List[mod
     return (
         db.query(models.Article)
         .join(models.article_tags)
-        .join(models.Tag)
-        .filter(models.Tag.slug == tag_slug)
-        .order_by(models.Article.created_at.desc())
         .limit(limit)
         .all()
     )
+
+
+# ===== GLOSSARY MANAGEMENT =====
+
+def create_glossary_term(db: Session, term_it: str, banned_term: str) -> models.GlossaryTerm:
+    term = models.GlossaryTerm(term_it=term_it, banned_term=banned_term)
+    db.add(term)
+    db.commit()
+    db.refresh(term)
+    return term
+
+
+def get_all_glossary_terms(db: Session) -> List[models.GlossaryTerm]:
+    return db.query(models.GlossaryTerm).order_by(models.GlossaryTerm.created_at.desc()).all()
+
+
+def delete_glossary_term(db: Session, term_id: int) -> Optional[models.GlossaryTerm]:
+    term = db.query(models.GlossaryTerm).filter(models.GlossaryTerm.id == term_id).first()
+    if term:
+        db.delete(term)
+        db.commit()
+    return term
