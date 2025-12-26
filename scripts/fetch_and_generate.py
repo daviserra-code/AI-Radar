@@ -16,7 +16,7 @@ ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 sys.path.append(ROOT_DIR)
 
 from app.database import SessionLocal, engine
-from app import models, crud
+from app import models, crud, rag
 from app import ai_client
 from scripts.news_sources import fetch_raw_news
 
@@ -138,6 +138,10 @@ if __name__ == "__main__":
             except Exception as e:
                 logger.error(f"  [ERROR] Processing failed for {link}: {e}")
 
+        if not args.fast:
+            logger.info("Ricostruzione indice RAG...")
+            rag.rebuild_index(db)
+            
         logger.info("Ingest completato.")
     finally:
         db.close()

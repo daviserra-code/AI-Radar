@@ -7,14 +7,14 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-llmobs_db}
       POSTGRES_USER: ${POSTGRES_USER:-llmobs_user}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-llmobs_pass}
-      
+
     volumes:
       - llmobs_pgdata:/var/lib/postgresql/data
     ports:
       # opzionale: se vuoi collegarti al DB dall'host
       - "5433:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U llmobs_user -d llmobs_db"]
+      test: [ "CMD-SHELL", "pg_isready -U llmobs_user -d llmobs_db" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -29,7 +29,7 @@ services:
       db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -37,30 +37,30 @@ services:
     environment:
       # Database
       DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg2://llmobs_user:llmobs_pass@db:5432/llmobs_db}
-      
+
       # Security
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:-dev_secret_key_change_in_production}
       JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
       JWT_ACCESS_TOKEN_EXPIRE_MINUTES: ${JWT_ACCESS_TOKEN_EXPIRE_MINUTES:-30}
-      
+
       # Application
       ENVIRONMENT: ${ENVIRONMENT:-production}
       DOMAIN: ${DOMAIN:-ai-radar.it}
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-https://ai-radar.it,https://www.ai-radar.it,https://llmonpremise.com,https://www.llmonpremise.com,http://localhost:8000}
       FORCE_HTTPS: ${FORCE_HTTPS:-true}
-      
+
       # Ollama
       OLLAMA_HOST: ${OLLAMA_HOST:-http://ollama:11434}
       OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:latest}
-      
+
       # Logging
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
       LOG_FILE: ${LOG_FILE:-logs/app.log}
-      
+
       # Rate Limiting
       RATE_LIMIT_ENABLED: ${RATE_LIMIT_ENABLED:-true}
       RATE_LIMIT_PER_MINUTE: ${RATE_LIMIT_PER_MINUTE:-60}
-      
+
       # Scheduler
       FETCH_INTERVAL_MINUTES: ${FETCH_INTERVAL_MINUTES:-5}
       ARTICLES_PER_FEED: ${ARTICLES_PER_FEED:-5}
@@ -68,18 +68,17 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
+      - llmobs_chroma:/app/chroma_store
     command: >
-      uvicorn app.main:app
-      --host 0.0.0.0
-      --port 8000
-      --reload
+      uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     networks:
       - ainetwork
 
 volumes:
   llmobs_pgdata:
+  llmobs_chroma:
+
 
 networks:
   ainetwork:
     external: true
-
