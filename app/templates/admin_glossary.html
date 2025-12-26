@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="admin-container" style="padding: 2rem 0;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h1 style="color: var(--neon-cyan);">Admin: Dynamic Glossary</h1>
+        <div style="display: flex; gap: 1rem;">
+            <a href="/admin/users" class="btn"
+                style="border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;">Users</a>
+            <a href="/admin/articles" class="btn"
+                style="border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;">Articles</a>
+        </div>
+    </div>
+
+    <!-- Description -->
+    <div
+        style="background: var(--bg-card); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-dim); margin-bottom: 2rem;">
+        <p style="color: var(--text-secondary); margin-bottom: 0;">
+            Rules defined here will be <strong>automatically injected</strong> into the AI prompt.
+            Use this to fix recurring translation errors (hallucinations).
+        </p>
+    </div>
+
+    <!-- Add New Rule Form -->
+    <div
+        style="background: var(--bg-card); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--neon-cyan); margin-bottom: 2rem;">
+        <h3 style="color: var(--text-main); margin-bottom: 1rem;">Add New Translation Rule</h3>
+        <form action="/admin/glossary" method="post"
+            style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 250px;">
+                <label style="display: block; color: var(--text-muted); margin-bottom: 0.5rem; font-size: 0.9em;">Banned
+                    Term (The Hallucination)</label>
+                <input type="text" name="banned_term" placeholder="e.g. Modelli di linguaggio grande" required
+                    style="width: 100%; padding: 0.8rem; background: var(--bg-main); border: 1px solid var(--border-dim); color: var(--text-main); border-radius: 4px;">
+            </div>
+            <div style="flex: 1; min-width: 250px;">
+                <label
+                    style="display: block; color: var(--text-muted); margin-bottom: 0.5rem; font-size: 0.9em;">Correct
+                    Term (Preferred)</label>
+                <input type="text" name="term_it" placeholder="e.g. LLM" required
+                    style="width: 100%; padding: 0.8rem; background: var(--bg-main); border: 1px solid var(--border-dim); color: var(--text-main); border-radius: 4px;">
+            </div>
+            <button type="submit"
+                style="padding: 0.8rem 1.5rem; background: var(--neon-cyan); color: black; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">
+                Add Rule
+            </button>
+        </form>
+    </div>
+
+    <!-- Existing Rules List -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-dim); border-radius: 8px; overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead style="background: rgba(0, 243, 255, 0.1);">
+                <tr>
+                    <th style="padding: 1rem; color: var(--neon-cyan);">Banned Term (Avoid)</th>
+                    <th style="padding: 1rem; color: var(--neon-cyan);">Correct Term (Use)</th>
+                    <th style="padding: 1rem; color: var(--neon-cyan); width: 100px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for term in terms %}
+                <tr style="border-bottom: 1px solid var(--border-dim);">
+                    <td style="padding: 1rem; color: #ff6b6b; font-family: monospace;">{{ term.banned_term }}</td>
+                    <td style="padding: 1rem; color: #10b981; font-weight: bold;">{{ term.term_it }}</td>
+                    <td style="padding: 1rem;">
+                        <form action="/admin/glossary/{{ term.id }}/delete" method="post"
+                            onsubmit="return confirm('Are you sure?');">
+                            <button type="submit"
+                                style="background: transparent; border: 1px solid #ff6b6b; color: #ff6b6b; padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer; font-size: 0.8em;">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                        No custom rules defined yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

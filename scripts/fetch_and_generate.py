@@ -103,9 +103,19 @@ if __name__ == "__main__":
             try:
                 # Add a simple timeout mechanism if ollama hangs (simulated via thread or just hope the lib doesn't hang forever)
                 # For now rely on the logger to at least tell us it started.
+                
+                # Fetch dynamic glossary
+                try:
+                    glossary_terms = crud.get_all_glossary_terms(db)
+                    glossary = {t.banned_term: t.term_it for t in glossary_terms}
+                except Exception as e:
+                    logger.warning(f"Could not fetch glossary: {e}")
+                    glossary = {}
+
                 article_data = ai_client.generate_article_from_news(
                     raw_title=raw_title,
                     raw_text=raw_text,
+                    glossary=glossary
                 )
 
                 article = crud.create_article(

@@ -24,7 +24,8 @@ class LLMError(Exception):
     pass
 
 
-def _call_llm(prompt: str) -> str:
+
+def _call_llm(prompt: str, glossary: Dict[str, str] = None) -> str:
     """
     Chiama il modello Ollama in locale usando HTTPX per controllo timeout.
     Ritorna il testo della risposta (content) così com'è. 
@@ -41,10 +42,15 @@ def _call_llm(prompt: str) -> str:
     host = host.rstrip("/")
     url = f"{host}/api/chat"
 
-    payload = {
-        "model": MODEL_NAME,
-        "messages": [
-            {"role": "system", "content": """Sei un Redattore Tech Senior per una testata italiana d'élite (stile Wired/Ars Technica).
+    # COSTRUZIONE DEL GLOSSARIO DINAMICO
+    glossary_text = ""
+    if glossary:
+        glossary_lines = []
+        for banned, correct in glossary.items():
+            glossary_lines.append(f'- "{correct}" -> [USAL] (MAI: "{banned}")')
+        glossary_text = "\n".join(glossary_lines)
+    
+    system_prompt = f"""Sei un Redattore Tech Senior per una testata italiana d'élite (stile Wired/Ars Technica).
 Il tuo compito è RISCRIVERE (non tradurre letteralmente) notizie tech dall'inglese all'italiano, mantenendo un tono professionale, fluido e naturale.
 
 GLOSSARIO TECNICO OBBLIGATORIO (MANDATORY):
@@ -59,16 +65,23 @@ Devi usare SEMPRE i termini a sinistra, MAI quelli a destra.
 - "Deploy" / "Deployment"          -> [USAL] o "Rilascio" (MAI: "Schieramento")
 - "Open Source"                    -> [USAL] (MAI: "Sorgente aperta")
 - "Silicon" (contesto chip)        -> "Silicio" (MAI: "Silicone")
+{glossary_text}
 
 LINEE GUIDA STILISTICHE:
 1.  **Mantieni l'inglese per i termini tecnici**: Se non c'è una traduzione italiana consolidata (es. "RAG", "Inference", "Buffer"), lascia il termine in inglese.
 2.  **Evita i calchi**: Non dire "è stato rilasciato da Meta", dì "Meta ha rilasciato".
 3.  **Sii giornalistico**: Usa un linguaggio tecnico ma accessibile agli addetti ai lavori.
 4.  **No traduzioni ridicole**: Se una frase suona stupida in italiano ("ossa di frutto di mare"), è sbagliata. Riscrivila o omettila se non sei sicuro del senso.
+5.  **RISPETTA IL GLOSSARIO SYSTEM**: Usa i termini tecnici inglesi (LLM, Framework, Pipeline, ecc.) dove appropriato. NON tradurli mai in modo letterale.
 
 OUTPUT FORMAT:
 Rispondi ESCLUSIVAMENTE con un JSON valido come richiesto.
-"""},
+"""
+
+    payload = {
+        "model": MODEL_NAME,
+        "messages": [
+            {"role": "system", "content": system_prompt},
             {"role": "user", "content": prompt},
         ],
         "options": {
@@ -98,6 +111,7 @@ Rispondi ESCLUSIVAMENTE con un JSON valido come richiesto.
         raise LLMError(f"Risposta inattesa da Ollama: {response_data}")
 
     return content
+
 
 
 def build_news_prompt(raw_title: str, raw_text: str) -> str:
@@ -214,13 +228,14 @@ def _extract_json_block(text: str) -> str:
     raise LLMError("Could not find matching closing '}' for JSON block")
 
 
-def generate_article_from_news(raw_title: str, raw_text: str) -> Dict[str, str]:
+
+def generate_article_from_news(raw_title: str, raw_text: str, glossary: Dict[str, str] = None) -> Dict[str, str]:
     """
     Dato un titolo + testo grezzo, interroga il LLM e ritorna
     un dict pronto per creare un Article.
     """
     prompt = build_news_prompt(raw_title, raw_text)
-    raw_response = _call_llm(prompt)
+    raw_response = _call_llm(prompt, glossary=glossary)
 
     # Proviamo a fare il parse robusto del JSON
     try:

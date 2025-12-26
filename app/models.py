@@ -121,3 +121,13 @@ class Tag(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     
     articles = relationship("Article", secondary=article_tags, back_populates="tags")
+
+
+class GlossaryTerm(Base):
+    __tablename__ = "glossary_terms"
+
+    id = Column(Integer, primary_key=True, index=True)
+    term_it = Column(String(255), nullable=False)  # The correct term (e.g. "LLM")
+    banned_term = Column(String(255), nullable=False)  # The bad term (e.g. "Modelli di linguaggio grande")
+    created_at = Column(DateTime, default=datetime.utcnow)
+

@@ -178,3 +178,36 @@ async def create_article(
     return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
 
 
+@router.get("/glossary", response_class=HTMLResponse)
+async def list_glossary(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_admin_user)
+):
+    terms = crud.get_all_glossary_terms(db)
+    return templates.TemplateResponse(
+        "admin_glossary.html",
+        {"request": request, "terms": terms, "current_user": current_user}
+    )
+
+@router.post("/glossary", response_class=HTMLResponse)
+async def add_glossary_term(
+    request: Request,
+    term_it: str = Form(...),
+    banned_term: str = Form(...),
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_admin_user)
+):
+    crud.create_glossary_term(db, term_it, banned_term)
+    return RedirectResponse(url="/admin/glossary", status_code=status.HTTP_302_FOUND)
+
+@router.post("/glossary/{term_id}/delete")
+async def delete_glossary_term(
+    term_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_admin_user)
+):
+    crud.delete_glossary_term(db, term_id)
+    return RedirectResponse(url="/admin/glossary", status_code=status.HTTP_302_FOUND)
+
+
