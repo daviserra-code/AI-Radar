@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="admin-container" style="padding: 2rem 0; max-width: 900px; margin: 0 auto;">
+    <div style="margin-bottom: 2rem;">
+        <a href="/admin/articles" style="color: var(--text-muted); text-decoration: none;">&larr; Torna alla lista</a>
+        <h1 style="color: var(--neon-cyan); margin-top: 0.5rem;">Modifica Articolo: {{ article.id }}</h1>
+    </div>
+
+    <form method="post" action="/admin/articles/{{ article.id }}/edit"
+        style="display: flex; flex-direction: column; gap: 1.5rem;">
+
+        <!-- MAIN INFO -->
+        <div
+            style="background: var(--bg-card); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-dim);">
+            <h3
+                style="color: var(--neon-green); margin-bottom: 1rem; border-bottom: 1px solid var(--border-dim); padding-bottom: 0.5rem;">
+                🇮🇹 Contenuto Base (Italiano)</h3>
+
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; color: var(--text-muted); margin-bottom: 0.5rem;">Titolo</label>
+                <input type="text" name="title" value="{{ article.title }}" required
+                    style="width: 100%; padding: 0.8rem; background: var(--bg-deep); border: 1px solid var(--border-dim); color: var(--text-main); border-radius: 4px;">
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; color: var(--text-muted); margin-bottom: 0.5rem;">Summary</label>
+                <textarea name="summary" rows="3"
+                    style="width: 100%; padding: 0.8rem; background: var(--bg-deep); border: 1px solid var(--border-dim); color: var(--text-main); border-radius: 4px;">{{ article.summary or '' }}</textarea>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; color: var(--text-muted); margin-bottom: 0.5rem;">Contenuto (HTML/Markdown
+                    supportato)</label>
+                <textarea name="content" rows="15" required
+                    style="width: 100%; padding: 0.8rem; background: var(--bg-deep); border: 1px solid var(--border-dim); color: var(--text-main); border-radius: 4px; font-family: monospace;">{{ article.content }}</textarea>
+            </div>
+        </div>
+
+        <!-- ENGLISH VARIANT -->
+        <div
+            style="background: var(--bg-card); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-dim);">
+            <h3
+                style="color: var(--neon-cyan); margin-bottom: 1rem; border-bottom: 1px solid var(--border-dim); padding-bottom: 0.5rem;">
+                🇬🇧 English Variant (Optional)</h3>
+
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; color: var(--text-muted); margin-bottom: 0.5rem;">Title (EN)</label>
+                <input type="text" name="title_en" value="{{ article.title_en or '' }}"
+                    style="width: 100%; padding: 0.8rem; background: var(--bg-deep); border: 1px solid var(--border-dim); color: var(--text-main); border-radius: 4px;">
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; color: var(--text-muted); margin-bottom: 0.5rem;">Summary (EN)</label>
+                <textarea name="summary_en" rows="3"
+                    style="width: 100%; padding: 0.8rem; background: var(--bg-deep); border: 1px solid var(--border-dim); color: var(--text-main); border-radius: 4px;">{{ article.summary_en or '' }}</textarea>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; color: var(--text-muted); margin-bottom: 0.5rem;">Content (EN)</label>
+                <textarea name="content_en" rows="15"
+                    style="width: 100%; padding: 0.8rem; background: var(--bg-deep); border: 1px solid var(--border-dim); color: var(--text-main); border-radius: 4px; font-family: monospace;">{{ article.content_en or '' }}</textarea>
+            </div>
+        </div>
+
+        <!-- META INFO -->
+        <div
+            style="background: var(--bg-card); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-dim);">
+            <h3
+                style="color: var(--text-muted); margin-bottom: 1rem; border-bottom: 1px solid var(--border-dim); padding-bottom: 0.5rem;">
+                Meta Dati</h3>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div>
+                    <label style="display: block; color: var(--text-muted); margin-bottom: 0.5rem;">Categoria</label>
+                    <input type="text" name="category_name"
+                        value="{{ article.category.name if article.category else 'Generale' }}" required
+                        style="width: 100%; padding: 0.8rem; background: var(--bg-deep); border: 1px solid var(--border-dim); color: var(--text-main); border-radius: 4px;">
+                </div>
+
+                <div>
+                    <label style="display: block; color: var(--text-muted); margin-bottom: 0.5rem;">Credibility Score
+                        (1-5)</label>
+                    <input type="number" name="credibility_score" value="{{ article.credibility_score }}" min="1"
+                        max="5" required
+                        style="width: 100%; padding: 0.8rem; background: var(--bg-deep); border: 1px solid var(--border-dim); color: var(--text-main); border-radius: 4px;">
+                </div>
+            </div>
+
+            <div style="margin-top: 1rem;">
+                <label style="display: block; color: var(--text-muted); margin-bottom: 0.5rem;">Source Name</label>
+                <input type="text" name="source_name" value="{{ article.source_name or '' }}"
+                    style="width: 100%; padding: 0.8rem; background: var(--bg-deep); border: 1px solid var(--border-dim); color: var(--text-main); border-radius: 4px;">
+            </div>
+
+            <div style="margin-top: 1rem;">
+                <label style="display: block; color: var(--text-muted); margin-bottom: 0.5rem;">Source URL</label>
+                <input type="url" name="source_url" value="{{ article.source_url or '' }}"
+                    style="width: 100%; padding: 0.8rem; background: var(--bg-deep); border: 1px solid var(--border-dim); color: var(--text-main); border-radius: 4px;">
+            </div>
+
+            <div style="margin-top: 1rem;">
+                <label style="display: block; color: var(--text-muted); margin-bottom: 0.5rem;">Image URL</label>
+                <input type="url" name="image_url" value="{{ article.image_url or '' }}"
+                    style="width: 100%; padding: 0.8rem; background: var(--bg-deep); border: 1px solid var(--border-dim); color: var(--text-main); border-radius: 4px;">
+            </div>
+
+            <div style="margin-top: 1rem;">
+                <label style="display: block; color: var(--text-muted); margin-bottom: 0.5rem;">Editor Comment</label>
+                <textarea name="editor_comment" rows="3"
+                    style="width: 100%; padding: 0.8rem; background: var(--bg-deep); border: 1px solid var(--border-dim); color: var(--text-main); border-radius: 4px;">{{ article.editor_comment or '' }}</textarea>
+            </div>
+        </div>
+
+        <div
+            style="position: sticky; bottom: 2rem; background: var(--bg-main); padding: 1rem; border: 1px solid var(--neon-cyan); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: var(--text-muted);">Modifiche non salvate andranno perse.</span>
+            <button type="submit"
+                style="padding: 0.8rem 2rem; background: var(--neon-cyan); color: black; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">
+                💾 Salva Modifiche
+            </button>
+        </div>
+
+    </form>
+</div>
+{% endblock %}

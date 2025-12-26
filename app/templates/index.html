@@ -68,7 +68,7 @@
       font-size: 1.2rem;
     ">×</button>
   </div>
-  
+
   <div class="hero-side-title">Archivio Totale</div>
   <div style="font-size: 2.5rem; font-weight: bold; color: var(--neon-cyan); margin-bottom: 0.5rem;">
     {{ total_articles }}
@@ -76,13 +76,14 @@
   <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2rem;">
     Articoli indicizzati nel sistema RAG
   </div>
-  
+
   {% if category_stats %}
   <div class="hero-side-title" style="margin-top: 1.5rem;">Categorie</div>
   <ul class="hero-list" style="list-style: none; padding: 0;">
     {% for stat in category_stats %}
     <li style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
-      <a href="/category/{{ stat.slug }}" style="color: var(--text-main); text-decoration: none; display: flex; align-items: center; gap: 0.5rem;">
+      <a href="/category/{{ stat.slug }}"
+        style="color: var(--text-main); text-decoration: none; display: flex; align-items: center; gap: 0.5rem;">
         <span style="font-size: 1.2rem;">{{ stat.icon or '📁' }}</span>
         <span>{{ stat.name }}</span>
       </a>
@@ -93,7 +94,7 @@
     {% endfor %}
   </ul>
   {% endif %}
-  
+
   <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border-dim);">
     <a href="/rss" style="color: var(--neon-cyan); font-size: 0.85rem; text-decoration: none;">
       📡 RSS Feed
@@ -102,19 +103,19 @@
 </aside>
 
 <script>
-function toggleStats() {
-  const panel = document.getElementById('statsPanel');
-  const button = document.getElementById('statsToggle');
-  const isOpen = panel.style.right === '0px';
-  
-  if (isOpen) {
-    panel.style.right = '-400px';
-    button.style.right = '2rem';
-  } else {
-    panel.style.right = '0px';
-    button.style.right = '370px';
+  function toggleStats() {
+    const panel = document.getElementById('statsPanel');
+    const button = document.getElementById('statsToggle');
+    const isOpen = panel.style.right === '0px';
+
+    if (isOpen) {
+      panel.style.right = '-400px';
+      button.style.right = '2rem';
+    } else {
+      panel.style.right = '0px';
+      button.style.right = '370px';
+    }
   }
-}
 </script>
 
 <section class="section-header">
@@ -131,42 +132,44 @@ function toggleStats() {
     {% if article.image_url %}
     <div style="margin: -1.5rem -1.5rem 1rem -1.5rem; overflow: hidden; border-radius: 8px 8px 0 0;">
       <img src="{{ article.image_url }}" alt="{{ article.title }}" loading="lazy"
-           style="width: 100%; height: 180px; object-fit: cover; display: block; image-rendering: -webkit-optimize-contrast; image-rendering: smooth;">
+        style="width: 100%; height: 180px; object-fit: cover; display: block; image-rendering: -webkit-optimize-contrast; image-rendering: smooth;">
     </div>
     {% endif %}
-    
+
     <div>
       <div>
         <span class="card-tag">
           {% if article.category %}
-            {{ article.category.icon or '📁' }} {{ article.category.name }}
+          {{ article.category.icon or '📁' }} {{ article.category.name }}
           {% else %}
-            📁 Generale
+          📁 Generale
           {% endif %}
         </span>
         {% if article.ai_generated %}
-          <span class="card-tag card-tag-ai">AI generated</span>
+        <span class="card-tag card-tag-ai">AI generated</span>
         {% else %}
-          <span class="card-tag card-tag-secondary">Editoriale</span>
+        <span class="card-tag card-tag-secondary">Editoriale</span>
         {% endif %}
         {% if article.source_name and article.credibility_score %}
-          {% set badge = get_credibility_badge(article.credibility_score) %}
-          <span class="card-tag credibility-badge {{ badge.class }}" 
-                style="background: {{ badge.color }}20; border-color: {{ badge.color }}; color: {{ badge.color }};" 
-                title="{{ badge.label }}">
-            {{ badge.badge }} {{ article.source_name }}
-          </span>
+        {% set badge = get_credibility_badge(article.credibility_score) %}
+        <span class="card-tag credibility-badge {{ badge.class }}"
+          style="background: {{ badge.color }}20; border-color: {{ badge.color }}; color: {{ badge.color }};"
+          title="{{ badge.label }}">
+          {{ badge.badge }} {{ article.source_name }}
+        </span>
         {% endif %}
       </div>
 
       <h3>
-        <a href="/article/{{ article.slug }}">{{ article.title }}</a>
+        <a href="/article/{{ article.slug }}">{{ get_lang_content(article, 'title', request.state.lang) }}</a>
       </h3>
 
-      {% if article.summary %}
-        <p>{{ article.summary }}</p>
+      {% if get_lang_content(article, 'summary', request.state.lang) %}
+      {% set summary = get_lang_content(article, 'summary', request.state.lang) %}
+      <p>{{ summary }}</p>
       {% else %}
-        <p>{{ article.content[:260] }}...</p>
+      {% set content = get_lang_content(article, 'content', request.state.lang) or article.content %}
+      <p>{{ content[:260] }}...</p>
       {% endif %}
     </div>
 

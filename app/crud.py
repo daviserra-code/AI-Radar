@@ -136,8 +136,69 @@ def get_latest_articles(db: Session, limit: int = 20) -> List[models.Article]:
     )
 
 
+def get_article_by_id(db: Session, article_id: int) -> Optional[models.Article]:
+    return db.query(models.Article).filter(models.Article.id == article_id).first()
+
+
 def get_article_by_slug(db: Session, slug: str) -> Optional[models.Article]:
     return db.query(models.Article).filter(models.Article.slug == slug).first()
+
+
+def update_article(
+    db: Session,
+    article_id: int,
+    title: Optional[str] = None,
+    summary: Optional[str] = None,
+    content: Optional[str] = None,
+    title_en: Optional[str] = None,
+    summary_en: Optional[str] = None,
+    content_en: Optional[str] = None,
+    category_name: Optional[str] = None,
+    source_url: Optional[str] = None,
+    source_name: Optional[str] = None,
+    credibility_score: Optional[int] = None,
+    image_url: Optional[str] = None,
+    editor_comment: Optional[str] = None,
+) -> Optional[models.Article]:
+    article = get_article_by_id(db, article_id)
+    if not article:
+        return None
+
+    if title:
+        article.title = title
+        article.slug = slugify(title)
+    if summary is not None:
+        article.summary = summary
+    if content:
+        article.content = content
+    
+    if title_en is not None:
+        article.title_en = title_en
+    if summary_en is not None:
+        article.summary_en = summary_en
+    if content_en is not None:
+        article.content_en = content_en
+
+    if category_name:
+        category = create_category_if_not_exists(db, category_name)
+        article.category_id = category.id
+    
+    if source_url is not None:
+        article.source_url = source_url
+    if source_name is not None:
+        article.source_name = source_name
+    if credibility_score is not None:
+        article.credibility_score = credibility_score
+    if image_url is not None:
+        article.image_url = image_url
+    if editor_comment is not None:
+        article.editor_comment = editor_comment
+
+    article.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(article)
+    return article
+
 
 
 def get_category_by_slug(db: Session, slug: str) -> Optional[models.Category]:

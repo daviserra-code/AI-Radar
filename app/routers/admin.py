@@ -58,3 +58,123 @@ async def toggle_subscription(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return RedirectResponse(url="/admin/users", status_code=status.HTTP_302_FOUND)
+
+@router.get("/articles", response_class=HTMLResponse)
+async def list_articles(
+    request: Request,
+    db: Session = Depends(get_db),
+    page: int = 1,
+    current_user: models.User = Depends(auth.get_current_admin_user)
+):
+    limit = 50
+    offset = (page - 1) * limit
+    articles = db.query(models.Article).order_by(models.Article.created_at.desc()).offset(offset).limit(limit).all()
+    total_articles = crud.get_total_articles_count(db)
+    
+    return templates.TemplateResponse(
+        "admin_articles.html",
+        {
+            "request": request, 
+            "articles": articles, 
+            "current_user": current_user,
+            "page": page,
+            "total_pages": (total_articles + limit - 1) // limit
+        }
+    )
+
+@router.get("/articles/{article_id}/edit", response_class=HTMLResponse)
+async def edit_article_form(
+    article_id: int,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_admin_user)
+):
+    article = crud.get_article_by_id(db, article_id)
+    if not article:
+        raise HTTPException(status_code=404, detail="Article not found")
+        
+    return templates.TemplateResponse(
+        "admin_article_edit.html",
+        {
+            "request": request,
+            "article": article,
+            "current_user": current_user
+        }
+    )
+
+from fastapi import Form
+from typing import Optional
+
+@router.post("/articles/{article_id}/edit", response_class=HTMLResponse)
+async def edit_article_submit(
+    article_id: int,
+    request: Request,
+    title: str = Form(...),
+    summary: Optional[str] = Form(None),
+    content: str = Form(...),
+    title_en: Optional[str] = Form(None),
+    summary_en: Optional[str] = Form(None),
+    content_en: Optional[str] = Form(None),
+    category_name: str = Form(...),
+    source_url: Optional[str] = Form(None),
+    source_name: Optional[str] = Form(None),
+    credibility_score: int = Form(...),
+    image_url: Optional[str] = Form(None),
+    editor_comment: Optional[str] = Form(None),
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_admin_user)
+):
+    article = crud.update_article(
+        db=db,
+        article_id=article_id,
+        title=title,
+        summary=summary,
+        content=content,
+        title_en=title_en,
+        summary_en=summary_en,
+        content_en=content_en,
+        category_name=category_name,
+        source_url=source_url,
+        source_name=source_name,
+        credibility_score=credibility_score,
+        image_url=image_url,
+        editor_comment=editor_comment
+    )
+    
+    if not article:
+        raise HTTPException(status_code=404, detail="Article not found")
+        
+    return RedirectResponse(url="/admin/articles", status_code=status.HTTP_302_FOUND)
+
+@router.get("/new", response_class=HTMLResponse)
+async def new_article_form(
+    request: Request,
+    current_user: models.User = Depends(auth.get_current_admin_user)
+):
+    return templates.TemplateResponse("admin_new.html", {"request": request, "current_user": current_user})
+
+@router.post("/new", response_class=HTMLResponse)
+async def create_article(
+    request: Request,
+    title: str = Form(...),
+    summary: str = Form(""),
+    content: str = Form(...),
+    category_name: str = Form("Generale"),
+    source_url: str = Form(""),
+    editor_comment: str = Form(""),
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_admin_user)
+):
+    crud.create_article(
+        db=db,
+        title=title,
+        summary=summary,
+        content=content,
+        category_name=category_name,
+        source_url=source_url,
+        editor_comment=editor_comment,
+        ai_generated=False
+    )
+    return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+
+

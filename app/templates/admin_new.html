@@ -5,7 +5,7 @@
 {% block content %}
 
 <div class="container">
-    
+
     <div style="margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between;">
         <h1 style="color: white;">> INJECT_NEW_SIGNAL</h1>
         <span class="mono-font" style="color: var(--text-muted); font-size: 0.8rem;">ADMIN_ACCESS_GRANTED</span>
@@ -13,16 +13,17 @@
 
     <div class="form-container">
         <form method="post" action="/admin/new">
-            
+
             <div class="form-group">
                 <label for="title">Titolo Segnale</label>
-                <input type="text" id="title" name="title" placeholder="Es: Llama-3 Benchmarks on RTX 4090..." required autocomplete="off">
+                <input type="text" id="title" name="title" placeholder="Es: Llama-3 Benchmarks on RTX 4090..." required
+                    autocomplete="off">
             </div>
 
             <div class="form-row">
                 <div class="form-group">
                     <label for="category">Categoria</label>
-                    <select id="category" name="category">
+                    <select id="category" name="category_name">
                         <option value="General">Generale</option>
                         <option value="Hardware">Hardware Lab</option>
                         <option value="LLM">Local LLMs</option>
@@ -39,17 +40,22 @@
 
             <div class="form-group">
                 <label for="summary">Briefing / Riassunto</label>
-                <textarea id="summary" name="summary" rows="3" placeholder="Sintesi per la card in homepage..."></textarea>
+                <textarea id="summary" name="summary" rows="3"
+                    placeholder="Sintesi per la card in homepage..."></textarea>
             </div>
 
             <div class="form-group">
                 <label for="content">Contenuto Markdown</label>
-                <textarea id="content" name="content" class="code-editor" placeholder="# Inizia a scrivere qui... Usa Markdown."></textarea>
+                <textarea id="content" name="content" class="code-editor"
+                    placeholder="# Inizia a scrivere qui... Usa Markdown."></textarea>
             </div>
 
             <div class="form-group" style="border-top: 1px dashed #333; padding-top: 1rem;">
-                <label for="editorial_comment" style="color: var(--neon-purple);">// Commento Editoriale (Davide)</label>
-                <textarea id="editorial_comment" name="editorial_comment" rows="2" placeholder="La tua opinione personale..."></textarea>
+                <label for="editorial_comment" style="color: var(--neon-purple);">// Commento Editoriale
+                    (Davide)</label>
+                <textarea id="editorial_comment" name="editor_comment" rows="2"
+                    placeholder="La tua opinione personale..."></textarea>
+
             </div>
 
             <button type="submit" class="btn-submit">

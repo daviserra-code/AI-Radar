@@ -59,6 +59,40 @@ rate_limit_per_minute = int(os.getenv("RATE_LIMIT_PER_MINUTE", "60"))
 rate_limit_per_hour = int(os.getenv("RATE_LIMIT_PER_HOUR", "1000"))
 app.add_middleware(RateLimitMiddleware, per_minute=rate_limit_per_minute, per_hour=rate_limit_per_hour)
 
+# 4. Language Middleware
+from starlette.middleware.base import BaseHTTPMiddleware
+
+class LanguageMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # Get language from cookie, default to 'it'
+        lang = request.cookies.get("preferred_language", "it")
+        request.state.lang = lang
+        response = await call_next(request)
+        return response
+
+app.add_middleware(LanguageMiddleware)
+
+# Make 'lang' available in all templates
+@app.middleware("http")
+async def add_lang_to_template_context(request: Request, call_next):
+    response = await call_next(request)
+    return response
+
+# More robust way to add global context
+# We can't easily inject into TemplateResponse here without overriding, so we'll rely on Request.state.lang
+# and a context processor if needed, but 'request' is already in templates.
+# Let's add a global function to help templates pick the right string.
+def get_lang_content(obj, attr, lang='it'):
+    """Helper to get attribute based on language, fallback to default."""
+    if lang == 'en':
+        val = getattr(obj, f"{attr}_en", None)
+        if val:
+            return val
+    return getattr(obj, attr, None)
+
+templates.env.globals["get_lang_content"] = get_lang_content
+
+
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="app/static"), name="static")

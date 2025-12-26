@@ -18,16 +18,7 @@
       {% endif %}
     </div>
 
-    <h1 class="article-title">{{ article.title }}</h1>
-
-    {% if article.title_en %}
-    <div style="margin: 1rem 0;">
-      <button id="langToggle" onclick="toggleLanguage()"
-        style="padding: 0.5rem 1rem; background: var(--bg-card); color: var(--neon-cyan); border: 1px solid var(--neon-cyan); border-radius: 4px; cursor: pointer; font-weight: 600;">
-        🌐 Show in English
-      </button>
-    </div>
-    {% endif %}
+    <h1 class="article-title">{{ get_lang_content(article, 'title', request.state.lang) }}</h1>
 
     <div class="meta meta-article">
       <span class="date">Pubblicato il {{ article.created_at.strftime("%Y-%m-%d %H:%M") }}</span>
@@ -69,14 +60,8 @@
   {% endif %}
 
   <section class="article-body" id="articleContent">
-    <div id="contentIt" style="display: block;">
-      {{ article.content | safe }}
-    </div>
-    {% if article.content_en %}
-    <div id="contentEn" style="display: none;">
-      {{ article.content_en | safe }}
-    </div>
-    {% endif %}
+    {% set content = get_lang_content(article, 'content', request.state.lang) or article.content %}
+    {{ content | safe }}
   </section>
 
   {% if article.source_url %}

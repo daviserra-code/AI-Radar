@@ -67,32 +67,7 @@ async def read_category(slug: str, request: Request, db: Session = Depends(get_d
         {"request": request, "category": category, "articles": articles},
     )
 
-@router.get("/new", response_class=HTMLResponse)
-async def new_article_form(request: Request):
-    return templates.TemplateResponse("new_article.html", {"request": request})
 
-@router.post("/new", response_class=HTMLResponse)
-async def create_article(
-    request: Request,
-    title: str = Form(...),
-    summary: str = Form(""),
-    content: str = Form(...),
-    category_name: str = Form("Generale"),
-    source_url: str = Form(""),
-    editor_comment: str = Form(""),
-    db: Session = Depends(get_db),
-):
-    crud.create_article(
-        db=db,
-        title=title,
-        summary=summary,
-        content=content,
-        category_name=category_name,
-        source_url=source_url,
-        editor_comment=editor_comment,
-        ai_generated=False
-    )
-    return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
 
 @router.get("/search", response_class=HTMLResponse)
 async def search(

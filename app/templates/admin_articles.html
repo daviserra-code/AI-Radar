@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="admin-container" style="padding: 2rem 0;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h1 style="color: var(--neon-cyan);">Admin: Gestione Articoli</h1>
+        <div style="display: flex; gap: 1rem;">
+            <a href="/admin/new" class="btn"
+                style="background: var(--neon-cyan); color: black; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; font-weight: bold;">+
+                Nuovo Articolo</a>
+            <a href="/admin/users" class="btn"
+                style="border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;">Utenti</a>
+        </div>
+    </div>
+
+    <div style="background: var(--bg-card); border: 1px solid var(--border-dim); border-radius: 8px; overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead style="background: rgba(0, 243, 255, 0.1);">
+                <tr>
+                    <th style="padding: 1rem; color: var(--neon-cyan);">ID</th>
+                    <th style="padding: 1rem; color: var(--neon-cyan);">Data</th>
+                    <th style="padding: 1rem; color: var(--neon-cyan);">Titolo</th>
+                    <th style="padding: 1rem; color: var(--neon-cyan);">Categoria</th>
+                    <th style="padding: 1rem; color: var(--neon-cyan);">Source</th>
+                    <th style="padding: 1rem; color: var(--neon-cyan);">Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for article in articles %}
+                <tr style="border-bottom: 1px solid var(--border-dim);">
+                    <td style="padding: 1rem; color: var(--text-muted);">{{ article.id }}</td>
+                    <td style="padding: 1rem;">{{ article.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td style="padding: 1rem;">
+                        <a href="/article/{{ article.slug }}" target="_blank"
+                            style="color: var(--text-main); font-weight: 500;">{{ article.title }}</a>
+                        {% if article.title_en %}
+                        <span style="font-size: 0.8em; color: var(--text-muted); display: block;">🇬🇧 {{
+                            article.title_en }}</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 1rem;">{{ article.category.name if article.category else '-' }}</td>
+                    <td style="padding: 1rem;">{{ article.source_name or '-' }}</td>
+                    <td style="padding: 1rem;">
+                        <a href="/admin/articles/{{ article.id }}/edit"
+                            style="display: inline-block; padding: 0.3rem 0.8rem; border: 1px solid var(--neon-cyan); color: var(--neon-cyan); border-radius: 4px; text-decoration: none; font-size: 0.9em; transition: all 0.2s;">
+                            ✏️ Edit
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div style="display: flex; justify-content: center; margin-top: 2rem; gap: 1rem;">
+        {% if page > 1 %}
+        <a href="?page={{ page - 1 }}"
+            style="padding: 0.5rem 1rem; border: 1px solid var(--border-dim); color: var(--text-main); border-radius: 4px; text-decoration: none;">&larr;
+            Precedente</a>
+        {% endif %}
+
+        <span style="padding: 0.5rem 1rem; color: var(--text-muted);">Pagina {{ page }} di {{ total_pages }}</span>
+
+        {% if page < total_pages %} <a href="?page={{ page + 1 }}"
+            style="padding: 0.5rem 1rem; border: 1px solid var(--border-dim); color: var(--text-main); border-radius: 4px; text-decoration: none;">
+            Successiva &rarr;</a>
+            {% endif %}
+    </div>
+</div>
+{% endblock %}

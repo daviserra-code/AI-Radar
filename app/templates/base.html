@@ -65,7 +65,9 @@
           <a href="/admin/users" class="nav-cta"
             style="background: rgba(0, 243, 255, 0.1); border: 1px solid var(--neon-cyan); color: var(--neon-cyan);">Admin
             Panel</a>
-          <a href="/admin/new" class="nav-cta">+ Editorial / Post</a>
+          <a href="/admin/articles" class="nav-cta"
+            style="border: 1px solid var(--neon-cyan); color: var(--neon-cyan);">Manage Articles</a>
+          <a href="/admin/new" class="nav-cta">+ New Signal</a>
           {% endif %}
           <div class="nav-user-dropdown" style="display: inline-flex; gap: 1rem; align-items: center;">
             <a href="/profile" style="color: var(--neon-cyan); font-weight: 600;">
@@ -77,7 +79,12 @@
           <a href="/login">Login</a>
           <a href="/register" class="nav-cta">Register</a>
           {% endif %}
+          <button onclick="toggleGlobalLanguage()" class="nav-cta"
+            style="background: transparent; border: 1px solid var(--neon-cyan); color: var(--neon-cyan); margin-left: 1rem; cursor: pointer;">
+            {{ '🇮🇹 IT' if request.state.lang == 'it' else '🇬🇧 EN' }}
+          </button>
         </nav>
+
 
         <!-- SEARCH -->
         <form class="search-form" method="get" action="/search">
@@ -180,6 +187,34 @@
       .catch(() => {
         document.getElementById('lastUpdate').textContent = '⏱️ --';
       });
+    // Language Toggle
+    function toggleGlobalLanguage() {
+      const currentLang = getCookie('preferred_language') || 'it';
+      const newLang = currentLang === 'it' ? 'en' : 'it';
+      setCookie('preferred_language', newLang, 365);
+      window.location.reload();
+    }
+
+    function setCookie(name, value, days) {
+      let expires = "";
+      if (days) {
+        const date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toUTCString();
+      }
+      document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    }
+
+    function getCookie(name) {
+      const nameEQ = name + "=";
+      const ca = document.cookie.split(';');
+      for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+      }
+      return null;
+    }
   </script>
 </body>
 
