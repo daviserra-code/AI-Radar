@@ -139,8 +139,11 @@ if __name__ == "__main__":
                 logger.error(f"  [ERROR] Processing failed for {link}: {e}")
 
         if not args.fast:
-            logger.info("Ricostruzione indice RAG...")
-            rag.rebuild_index(db)
+            # logic specific to slow mode if any...
+            pass
+            
+        logger.info("Ricostruzione indice RAG...")
+        rag.rebuild_index(db)
             
         logger.info("Ingest completato.")
     finally:
